@@ -19,15 +19,15 @@ Progetto Supabase: `rratuwwmqgvkvyvvpqiy` → `https://rratuwwmqgvkvyvvpqiy.supa
 
 ### Branch
 
-- `main` = **produzione** (`https://xerioth.pages.dev`): quando una versione è pronta, merge di `dev` e poi `.\scripts\release.cmd patch|minor|major` (versione, tag, push; vedi CLAUDE.md, "Release");
-- `dev` e gli altri branch = **anteprime** (`https://<branch>.xerioth.pages.dev`).
+- `main` = **produzione** (`https://xerioth-character-sheet.pages.dev`): quando una versione è pronta, merge di `dev` e poi `.\scripts\release.cmd patch|minor|major` (versione, tag, push; vedi CLAUDE.md, "Release");
+- `dev` e gli altri branch = **anteprime** (`https://<branch>.xerioth-character-sheet.pages.dev`).
 
 ### Configurazione *(tu, dalla dashboard Cloudflare)*
 
 1. <https://dash.cloudflare.com> → registrati (piano Free).
 2. **Workers & Pages → Create → Pages → Connect to Git** (se la dashboard propone Workers, scegli il link per Pages) → autorizza GitHub → repo `xerioth-character-sheet`.
 3. Impostazioni di build:
-   - **Project name**: `xerioth` (se è preso, Cloudflare aggiunge un suffisso: l'indirizzo cambia di conseguenza in tutti i passi sotto)
+   - **Project name**: `xerioth-character-sheet`
    - **Production branch**: `main`
    - **Framework preset**: *React (Vite)* → build `npm run build`, output `dist`
    - **Environment variables** (sia *Production* che *Preview*):
@@ -50,14 +50,14 @@ Flusso: l'app manda a Google → Google torna su `https://rratuwwmqgvkvyvvpqiy.s
 1. <https://console.cloud.google.com> → nuovo progetto `Xerioth`.
 2. **Google Auth Platform → Branding**:
    - App name `Xerioth`, email di supporto tua, email di contatto dello sviluppatore;
-   - **Application home page**: `https://xerioth.pages.dev`;
-   - **Application privacy policy link**: `https://xerioth.pages.dev/privacy`;
-   - **Authorized domains**: `rratuwwmqgvkvyvvpqiy.supabase.co` e `xerioth.pages.dev`;
+   - **Application home page**: `https://xerioth-character-sheet.pages.dev`;
+   - **Application privacy policy link**: `https://xerioth-character-sheet.pages.dev/privacy`;
+   - **Authorized domains**: `rratuwwmqgvkvyvvpqiy.supabase.co` e `xerioth-character-sheet.pages.dev`;
    - niente logo (farebbe scattare la verifica di Google).
 3. **Audience**: *External*. Poi **Publish app** (stato *In production*): senza home page e privacy policy il pulsante resta disattivato. Con i soli permessi base non serve la verifica di Google; in stato *Testing* invece entrerebbero solo gli indirizzi aggiunti a mano come test user.
 4. **Data Access**: solo `openid`, `.../auth/userinfo.email`, `.../auth/userinfo.profile`.
 5. **Clients → Create client** → *Web application*:
-   - **Authorized JavaScript origins**: `http://localhost:5173`, `https://xerioth.pages.dev`
+   - **Authorized JavaScript origins**: `http://localhost:5173`, `https://xerioth-character-sheet.pages.dev`
    - **Authorized redirect URIs**: `https://rratuwwmqgvkvyvvpqiy.supabase.co/auth/v1/callback`
    - copia **Client ID** e **Client secret** (il secret non va in chat né su git).
 
@@ -68,8 +68,8 @@ Nella schermata di consenso Google mostrerà "accedi a rratuwwmqgvkvyvvpqiy.supa
 *Authentication*:
 - **Sign In / Providers → Google**: attiva, incolla Client ID e Client secret, salva.
 - **URL Configuration**:
-  - **Site URL**: `https://xerioth.pages.dev`
-  - **Redirect URLs**: `http://localhost:5173/**`, `https://xerioth.pages.dev/**`, `https://*.xerioth.pages.dev/**` (anteprime)
+  - **Site URL**: `https://xerioth-character-sheet.pages.dev`
+  - **Redirect URLs**: `http://localhost:5173/**`, `https://xerioth-character-sheet.pages.dev/**`, `https://*.xerioth-character-sheet.pages.dev/**` (anteprime)
 - Se ti sei già registrato con email e password usando lo stesso indirizzo Gmail, al primo accesso con Google Supabase collega i due metodi allo stesso utente: schede e ruolo Master restano.
 
 ### Nell'app
