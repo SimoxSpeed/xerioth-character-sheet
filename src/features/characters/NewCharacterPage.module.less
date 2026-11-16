@@ -1,0 +1,72 @@
+@import '../../styles/tokens.less';
+
+.page {
+  max-width: 820px;
+  display: flex;
+  flex-direction: column;
+  gap: @space-4;
+
+  h1 {
+    font-size: 26px;
+    margin-top: @space-2;
+  }
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: @space-3;
+
+  h2 {
+    font-size: 17px;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: @space-3;
+}
+
+.class-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: @space-3;
+  align-items: end;
+  padding-top: @space-2;
+  border-top: 1px solid var(--border);
+}
+
+.attributes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: @space-3;
+}
+
+.attribute-input {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+}
+
+.modifier {
+  min-width: 2.5em;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: @space-2;
+}
