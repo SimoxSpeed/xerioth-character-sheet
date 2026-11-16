@@ -82,4 +82,4 @@ npm run dev     # http://localhost:5173
 
 ## Pubblicazione online
 
-Cloudflare Pages e accesso con Google: [06-pubblicazione.md](06-pubblicazione.md).
+Cloudflare Pages, accesso con Google e GitHub Action contro la pausa: [06-pubblicazione.md](06-pubblicazione.md).

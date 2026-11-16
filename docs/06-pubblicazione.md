@@ -74,3 +74,15 @@ Nella schermata di consenso Google mostrerà "accedi a rratuwwmqgvkvyvvpqiy.supa
 - **Pagina di accesso**: pulsante **Accedi con Google** in cima, poi "oppure" e il form email e password (resta attivo). Il logo "G" è un SVG in `components/GoogleIcon.tsx`, esportato da `icons.ts` (lucide non ha i loghi dei marchi). Al ritorno da Google si torna alla pagina da cui si era partiti.
 - **Client Supabase**: flusso `pkce`.
 - **Profilo**: il nome visualizzato arriva dall'account Google (vedi `profiles` in [02-database.md](02-database.md)).
+
+---
+
+## Pausa del piano Free di Supabase
+
+Dopo **7 giorni senza attività** il progetto va in pausa (si riattiva dalla dashboard, i dati restano). La GitHub Action [`keep-supabase-awake.yml`](../.github/workflows/keep-supabase-awake.yml) fa una richiesta al database il lunedì e il giovedì.
+
+Configurazione *(tu)*: GitHub → repo → **Settings → Secrets and variables → Actions → New repository secret**:
+- `SUPABASE_URL` = `https://rratuwwmqgvkvyvvpqiy.supabase.co`
+- `SUPABASE_PUBLISHABLE_KEY` = la publishable key
+
+Poi **Actions → Supabase sveglio → Run workflow** per provarla. Nei repo pubblici GitHub sospende le azioni programmate dopo 60 giorni senza commit: arriva una mail e si riattivano con un clic.
