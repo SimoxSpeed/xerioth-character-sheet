@@ -243,7 +243,7 @@ function SkillItem({ sheet, skill, showAttribute = false }: ItemProps) {
             )}
           </span>
           <DiceIcon aria-hidden className={styles.dice} />
-          {/* "Liv 9": clic sul numero per modificarlo */}
+          {/* "Liv" sopra, il numero sotto: clic sul numero per modificarlo */}
           <span className={styles.levelPair}>
             <small>Liv</small>
             <NoRoll>

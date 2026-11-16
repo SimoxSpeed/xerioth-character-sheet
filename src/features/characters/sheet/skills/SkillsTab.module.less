@@ -160,19 +160,21 @@ input.search {
   line-height: 16px;
 }
 
-// "Liv 9": etichetta piccola accanto al numero, allineato a destra
+// "Liv" sopra, il numero sotto (come nei poteri)
 .level-pair {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 5px;
+  gap: 3px;
 
   > small {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
+    line-height: 1;
     text-transform: uppercase;
     color: var(--text-muted);
+    white-space: nowrap;
   }
 
   .max {
@@ -236,12 +238,12 @@ input.search {
 
 // --- Riga in Gioco: solo nome e livello in evidenza ---------------------------
 .cells.play-cells {
-  grid-template-columns: minmax(0, 1fr) 18px minmax(64px, auto);
+  grid-template-columns: minmax(0, 1fr) 18px 40px;
   gap: @space-2;
   padding: 9px @space-2 9px @space-3;
 
   @media @bp-mobile {
-    grid-template-columns: minmax(0, 1fr) 16px minmax(58px, auto);
+    grid-template-columns: minmax(0, 1fr) 16px 40px;
     padding: 9px 4px 9px @space-2;
   }
 

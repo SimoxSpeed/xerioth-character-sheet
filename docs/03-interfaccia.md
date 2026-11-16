@@ -76,15 +76,15 @@ La scheda è **sempre modificabile**, come una scheda di carta con la matita in 
 ### 2. Capacità
 Interruttore **Raggruppa** (la scelta resta nel browser): acceso, gruppi per **caratteristica** (titolo con valore e modificatore, testo semplice); spento, elenco unico in ordine alfabetico con la sigla della caratteristica accanto al nome. Filtro rapido per caratteristica (ABI, COS…) e ricerca. Niente somma e niente stima dei giorni (stanno in *Allenamenti*).
 
-**Gerarchia della riga** (in Gioco): devono saltare all'occhio solo **nome** e **livello**. Meno tabelle possibile: etichette **accanto** ai numeri, non intestazioni di colonna.
+**Gerarchia della riga** (in Gioco): devono saltare all'occhio solo **nome** e **livello**. Meno tabelle possibile: ogni numero ha la sua etichetta piccola **sopra**, non intestazioni di colonna.
 ```
-Spada (armi medie)                   Liv 1
-▬▬───────────────────── 7 / 100
+Spada (armi medie)                    LIV
+▬▬───────────────────── 7 / 100        1
 
-Destrezza                            Liv 4
-[MAX]
+Destrezza                             LIV
+[MAX]                                  4
 ```
-- Nome a sinistra (a capo solo tra parole, mai tagliato); **Liv** e livello grande allineati a destra, centrati in verticale (NA tenue).
+- Nome a sinistra (a capo solo tra parole, mai tagliato); a destra **Liv** sopra e livello grande sotto, centrati (NA tenue).
 - Avanzamento: linea sottile sotto il nome con i punti piccoli; al MAX la scritta **MAX** prende il posto della barra.
 - Dado: compare solo al passaggio del mouse (il tocco tira comunque). Freccia della descrizione tenue, piena al passaggio.
 - Separatori leggeri tra le righe.
