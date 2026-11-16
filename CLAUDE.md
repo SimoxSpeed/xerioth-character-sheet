@@ -37,3 +37,24 @@ React 19, TypeScript strict (`noUncheckedIndexedAccess`, `verbatimModuleSyntax`)
 - Niente Supabase CLI né Docker. Le migrazioni si scrivono in `supabase/migrations/AAAAMMGGHHMMSS_nome.sql` e si applicano con l'MCP `supabase` (`apply_migration`).
 - Dopo ogni migrazione: `generate_typescript_types` in `src/lib/database.types.ts`, poi `get_advisors` per la sicurezza, poi aggiorna `docs/02-database.md`.
 - I permessi stanno nelle policy RLS: il giocatore vede solo le sue schede, il Master (per campagna, assegnato da DB) tutte quelle della campagna, i tiri sono visibili a tutto il gruppo.
+
+## Git
+
+- Si lavora su `dev`; `main` è il branch di rilascio e Cloudflare Pages pubblica ogni suo push. Le release partono da `main` dopo un merge di `dev`.
+- Messaggi di commit: una sola riga, Conventional Commits con gitmoji, in inglese, all'imperativo e in minuscolo, senza scope, body o trailer (niente `Co-Authored-By`). Brevi e diretti: cosa cambia, non perché né come. Esempi: `feat: ✨ add google sign-in`, `fix: 🐛 display sign-in errors`, `ci: 👷 keep supabase project awake`.
+- Le modifiche a questo file e a `docs/` vanno nel commit che implementa ciò che descrivono: niente commit `docs` separati, niente fixup del commit che le ha introdotte.
+- Commit, push e riscritture della history solo su richiesta.
+- Il commit di release (`chore(release): 🚀 release X.Y.Z`, unica eccezione alla regola senza scope) lo crea solo `scripts/release.ps1`, mai a mano.
+
+## Release
+
+- **Versione:** unica fonte `version` in `package.json` (e `package-lock.json`). La incrementa solo lo script.
+- **Pubblicare** (Windows, da `main` dopo il merge di `dev`): `.\scripts\release.cmd patch|minor|major`. Lo lancia chi fa la release, non Claude. Richiede GitHub CLI autenticata con permesso di push (`gh auth login`).
+  1. Controlla branch pulito e allineato a origin, `dev` già unito, tag libero; poi apre il Blocco note per le note di rilascio. **Le note sono per i giocatori**, anche quando le scrive Claude: cosa cambia per loro, in italiano, testo semplice con trattini; niente dettagli di sviluppo (script, test, migrazioni, refactoring, nomi di file).
+  2. Incrementa la versione (`npm version --no-git-tag-version`).
+  3. Lancia `npm test` e `npm run build`.
+  4. Dopo conferma: commit, tag annotato `vX.Y.Z` e push atomico di `main` e tag. Cloudflare Pages pubblica il sito.
+  5. Con `gh release create` crea la release su GitHub con le note.
+  6. Porta `dev` (locale e origin) al commit di release, se è un avanzamento semplice.
+  Se fallisce prima del commit, rimette `package.json` e `package-lock.json` com'erano.
+- Gli script stanno in `scripts/` come `.ps1` salvati in UTF-8 **con BOM** (PowerShell 5.1 senza BOM legge male le lettere accentate), con accanto un `.cmd` che li lancia senza toccare la ExecutionPolicy. La radice del repo per lo script è `Split-Path -Parent $PSScriptRoot`; uno script che fallisce esce con `exit 1`.

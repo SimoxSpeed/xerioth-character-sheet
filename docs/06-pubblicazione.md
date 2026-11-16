@@ -19,7 +19,7 @@ Progetto Supabase: `rratuwwmqgvkvyvvpqiy` → `https://rratuwwmqgvkvyvvpqiy.supa
 
 ### Branch
 
-- `main` = **produzione** (`https://xerioth.pages.dev`), ci si fa merge di `dev` quando una versione è pronta;
+- `main` = **produzione** (`https://xerioth.pages.dev`): quando una versione è pronta, merge di `dev` e poi `.\scripts\release.cmd patch|minor|major` (versione, tag, push; vedi CLAUDE.md, "Release");
 - `dev` e gli altri branch = **anteprime** (`https://<branch>.xerioth.pages.dev`).
 
 ### Configurazione *(tu, dalla dashboard Cloudflare)*
