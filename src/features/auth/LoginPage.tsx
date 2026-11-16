@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router'
 import { GoogleIcon } from '../../components/icons'
+import { ThemeToggle } from '../../components/ThemeToggle'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from './AuthProvider'
 import styles from './LoginPage.module.less'
@@ -66,6 +67,9 @@ export function LoginPage() {
 
   return (
     <main className={styles.page}>
+      <div className={styles.corner}>
+        <ThemeToggle />
+      </div>
       <form className={styles.panel} onSubmit={handleSubmit}>
         <header className={styles.header}>
           <h1>Xerioth</h1>
