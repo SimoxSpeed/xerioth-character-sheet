@@ -1,0 +1,347 @@
+@import '../../../../styles/tokens.less';
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: @space-5;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: @space-2;
+}
+
+input.search {
+  flex: 1 1 200px;
+  width: auto;
+}
+
+.chips {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+
+.chip {
+  flex: none;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+  }
+}
+
+.chip-active {
+  .chip();
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: @space-3;
+  padding: 0 @space-2 4px;
+  border-bottom: 2px solid var(--frame);
+
+  h3 {
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  // "Aggiungi": stessa pillola delle altre sezioni
+  :global(.btn) {
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+}
+
+.count {
+  margin-left: 4px;
+  font-family: @font-body;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  border-bottom: 1px solid var(--frame-soft);
+}
+
+.equipped-item {
+  background: linear-gradient(90deg, var(--accent-soft), transparent 60%);
+}
+
+.depleted .name {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.row {
+  display: flex;
+  align-items: stretch;
+}
+
+// nome · in uso · quantità · cariche · valore · usa
+.cells {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px 104px 84px minmax(60px, 120px) 56px;
+  align-items: center;
+  gap: @space-3;
+  padding: 7px @space-2;
+
+  @media (max-width: 1280px) {
+    grid-template-columns: minmax(0, 1fr) 64px 104px 84px 56px;
+
+    .value {
+      display: none;
+    }
+  }
+
+  @media @bp-mobile {
+    grid-template-columns: auto 1fr auto auto;
+    grid-template-areas:
+      'name name name name'
+      'equip charges qty use';
+    gap: 6px @space-2;
+    padding: 8px 4px;
+
+    .name-cell {
+      grid-area: name;
+    }
+  }
+}
+
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+  min-width: 0;
+}
+
+.slot-icon {
+  flex: none;
+  color: var(--accent);
+}
+
+.name {
+  min-width: 0;
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.slot {
+  flex: none;
+  .sheet-label();
+}
+
+// Interruttore "In uso"
+.equip-off,
+.equip-on {
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+
+  @media @bp-mobile {
+    grid-area: equip;
+  }
+}
+
+.equip-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.qty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+
+  > button {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--text-soft);
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+
+  @media @bp-mobile {
+    grid-area: qty;
+  }
+}
+
+.charges {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  color: var(--text-soft);
+
+  small {
+    .sheet-label();
+    font-size: 9px;
+  }
+
+  b {
+    color: var(--text);
+    font-size: 16px;
+  }
+
+  @media @bp-mobile {
+    grid-area: charges;
+    flex-direction: row;
+    gap: 6px;
+    justify-content: flex-start;
+  }
+}
+
+.value {
+  font-size: 13px;
+  color: var(--c-gold);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.use {
+  padding: 5px 0;
+  border: 1px solid var(--accent);
+  border-radius: @radius-sm;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--accent);
+    color: var(--accent-contrast);
+  }
+
+  &:disabled {
+    border-color: var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  @media @bp-mobile {
+    grid-area: use;
+    padding: 5px 14px;
+  }
+}
+
+.expand {
+  flex: none;
+  width: 32px;
+  border: 0;
+  border-radius: @radius-sm;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+  margin: 0 @space-2 @space-3;
+  padding: @space-3;
+  border-left: 3px solid var(--frame);
+  border-radius: 0 @radius-sm @radius-sm 0;
+  background: var(--surface-2);
+  font-size: 14.5px;
+
+  p {
+    margin: 0;
+    white-space: pre-line;
+  }
+}
+
+.detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: @space-2;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.empty {
+  margin: @space-2;
+}
+
+// Aperta: riga e dettaglio sono una scheda sola
+.item-open {
+  .open-item();
+}

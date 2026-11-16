@@ -1,0 +1,523 @@
+@import '../../../../styles/tokens.less';
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: @space-4;
+}
+
+// --- Barra: ricerca, filtro per caratteristica, aggiungi ----------------------
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: @space-2;
+}
+
+// "Aggiungi": stessa forma a pillola degli altri controlli della barra
+.toolbar :global(.btn) {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+input.search {
+  flex: 1 1 180px;
+  width: auto;
+}
+
+.chips {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+
+.chip {
+  flex: none;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+  }
+}
+
+.chip-active {
+  .chip();
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+// --- Gruppi per caratteristica -----------------------------------------------
+// Se il pannello è largo, i gruppi si dispongono su due colonne.
+.tab {
+  container-type: inline-size;
+}
+
+.groups,
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: @space-4;
+}
+
+// Niente "columns" CSS: con la frammentazione ogni :hover rifaceva il layout di tutta la lista.
+@container (min-width: 880px) {
+  .groups {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: @space-6;
+    align-items: start;
+  }
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+}
+
+.group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: @space-3;
+  padding: 0 0 4px @space-3;
+  border-bottom: 2px solid var(--frame);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+
+  @media @bp-mobile {
+    padding-left: @space-2;
+  }
+}
+
+// Interruttore "Raggruppa"
+.group-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+  }
+}
+
+.group-toggle-on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+// Elenco senza gruppi: una riga sopra, come il titolo dei gruppi
+.flat-list {
+  border-top: 2px solid var(--frame);
+}
+
+// Sigla della caratteristica accanto al nome (solo senza gruppi)
+.attr-tag {
+  margin-left: 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  vertical-align: 1px;
+}
+
+// Capacità al massimo: la scritta MAX sta dove sarebbe la barra di avanzamento
+.max-line {
+  align-self: flex-start;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 16px;
+}
+
+// "Liv 9": etichetta piccola accanto al numero, allineato a destra
+.level-pair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+
+  > small {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .max {
+    margin: 0;
+  }
+}
+
+// Livello: modificabile con un clic (bordo tratteggiato al passaggio)
+.level-value {
+  min-width: 1.3em;
+  padding: 0 2px;
+  font-family: @font-display;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.maxed .level-value {
+  color: var(--accent-strong);
+}
+
+.group-value {
+  margin-left: @space-3;
+  font-family: @font-body;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+
+  // Modificatore: testo semplice, niente ovale
+  small {
+    margin-left: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent-strong);
+  }
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  border-bottom: 1px solid color-mix(in srgb, var(--frame-soft) 55%, transparent);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  // Freccia della descrizione: tenue, piena al passaggio
+  &:hover .expand,
+  .expand[aria-expanded='true'] {
+    opacity: 1;
+  }
+}
+
+// --- Riga in Gioco: solo nome e livello in evidenza ---------------------------
+.cells.play-cells {
+  grid-template-columns: minmax(0, 1fr) 18px minmax(64px, auto);
+  gap: @space-2;
+  padding: 9px @space-2 9px @space-3;
+
+  @media @bp-mobile {
+    grid-template-columns: minmax(0, 1fr) 16px minmax(58px, auto);
+    padding: 9px 4px 9px @space-2;
+  }
+
+  .level {
+    font-size: 24px;
+  }
+
+  // Il dado compare solo passando sopra la riga
+  .dice {
+    opacity: 0;
+    transition:
+      opacity 0.12s,
+      transform 0.15s;
+  }
+
+  &:hover .dice,
+  &:focus-visible .dice {
+    opacity: 1;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+// Avanzamento: linea sottile sotto il nome, numeri piccoli e quieti
+.progress-line {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+  max-width: 260px;
+
+  > [role='progressbar'] {
+    flex: 1;
+    height: 3px;
+    box-shadow: none;
+  }
+
+  .progress-text {
+    flex: none;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+}
+
+.maxed .level {
+  color: var(--accent-strong);
+}
+
+.row {
+  display: flex;
+  align-items: stretch;
+}
+
+// Celle della riga: nome, livello, avanzamento, dado
+.cells {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px minmax(90px, 120px) 18px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px @space-2;
+
+  @media @bp-mobile {
+    grid-template-columns: minmax(0, 1fr) 46px 84px 18px;
+    gap: @space-2;
+    padding: 8px 4px;
+  }
+}
+
+.cells-editing {
+  grid-template-columns: minmax(0, 1fr) 56px minmax(130px, 190px) auto;
+
+  @media @bp-mobile {
+    grid-template-columns: minmax(0, 1fr) 46px;
+
+    > :nth-child(3),
+    > :nth-child(4) {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.rollable {
+  .rollable();
+  border-radius: @radius-sm;
+
+  &:hover .dice {
+    color: var(--accent);
+    transform: rotate(-12deg) scale(1.1);
+  }
+}
+
+.name {
+  min-width: 0;
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+  // A capo solo tra parole (con sillabazione italiana), mai a metà parola
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+
+.level {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: @font-display;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.na {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.max {
+  margin-top: 2px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-family: @font-body;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.progress-text {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dice {
+  width: 18px !important;
+  height: 18px !important;
+  color: var(--text-muted);
+  transition:
+    color 0.12s,
+    transform 0.15s;
+}
+
+.edit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.expand {
+  flex: none;
+  width: 32px;
+  border: 0;
+  border-radius: @radius-sm;
+  background: transparent;
+  color: var(--text-muted);
+  opacity: 0.35;
+  transition: opacity 0.12s;
+
+  // Senza mouse non c'è passaggio: un po' più visibile
+  @media (hover: none) {
+    opacity: 0.6;
+  }
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+}
+
+// --- Dettaglio (descrizione e requisiti) -------------------------------------
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+  margin: 0 @space-2 @space-3;
+  padding: @space-3;
+  border-left: 3px solid var(--frame);
+  border-radius: 0 @radius-sm @radius-sm 0;
+  background: var(--surface-2);
+  font-size: 14.5px;
+
+  p {
+    margin: 0;
+    white-space: pre-line;
+  }
+}
+
+
+
+
+
+.detail-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: @space-2 @space-4;
+}
+
+.detail-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+// Interruttore MAX nel dettaglio
+.max-toggle {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
+}
+
+.max-toggle-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+
+  &:hover {
+    color: var(--accent-contrast);
+  }
+}
+
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: @space-2;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.inline-select {
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: @radius-sm;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+// Aperta: riga e dettaglio sono una scheda sola
+.item-open {
+  .open-item();
+}

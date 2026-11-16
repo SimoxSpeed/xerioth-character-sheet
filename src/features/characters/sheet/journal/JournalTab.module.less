@@ -1,0 +1,154 @@
+@import '../../../../styles/tokens.less';
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: @space-4;
+
+  > p {
+    margin: 0;
+  }
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @space-2;
+
+  input {
+    flex: 1 1 220px;
+    width: auto;
+  }
+
+  select {
+    flex: 0 1 200px;
+    width: auto;
+  }
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+}
+
+.chapter {
+  margin: 0;
+  font-size: 20px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+}
+
+.card {
+  .card();
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+}
+
+.done {
+  .title {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+}
+
+.card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: @space-2;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.kind {
+  .label-caps();
+  white-space: nowrap;
+}
+
+.title {
+  flex: 1 1 200px;
+  margin: 0;
+  font-family: @font-body;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.addressed {
+  font-weight: 400;
+  color: var(--text-soft);
+}
+
+.private {
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: help;
+}
+
+.actions {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.body {
+  font-size: 15px;
+}
+
+.body-clamped {
+  .body();
+  max-height: 220px;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+}
+
+.more {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--info);
+}
+
+.prayer {
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+  padding-top: @space-2;
+  border-top: 1px dashed var(--border);
+}
+
+.prayer-header {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+}

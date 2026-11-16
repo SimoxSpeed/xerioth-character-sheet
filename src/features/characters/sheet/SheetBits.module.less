@@ -1,0 +1,44 @@
+@import '../../../styles/tokens.less';
+
+// Avanzamento: linea sottile, numeri piccoli e quieti (cliccabili)
+.line {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+  max-width: 280px;
+
+  > [role='progressbar'] {
+    flex: 1;
+    min-width: 28px;
+    height: 3px;
+    box-shadow: none;
+  }
+}
+
+.points-area {
+  display: inline-flex;
+  flex: none;
+  cursor: default;
+}
+
+.points {
+  flex: none;
+  padding: 1px 5px;
+  border: 1px dashed transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+
+  // Si capisce che è modificabile solo avvicinandosi
+  &:hover,
+  &:focus-visible {
+    border-color: var(--border);
+    color: var(--text);
+  }
+}

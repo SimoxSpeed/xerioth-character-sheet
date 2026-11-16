@@ -4,6 +4,7 @@ import { LoginPage } from './features/auth/LoginPage'
 import { RequireAuth } from './features/auth/RequireAuth'
 import { HomePage } from './features/characters/HomePage'
 import { NewCharacterPage } from './features/characters/NewCharacterPage'
+import { CharacterSheetPage } from './features/characters/sheet/CharacterSheetPage'
 
 export function App() {
   return (
@@ -18,6 +19,7 @@ export function App() {
       >
         <Route index element={<HomePage />} />
         <Route path="campagne/:campaignId/nuovo-personaggio" element={<NewCharacterPage />} />
+        <Route path="personaggi/:characterId" element={<CharacterSheetPage />} />
         <Route path="*" element={<p className="muted">Pagina non trovata.</p>} />
       </Route>
     </Routes>

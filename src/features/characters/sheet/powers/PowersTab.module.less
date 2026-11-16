@@ -1,0 +1,399 @@
+@import '../../../../styles/tokens.less';
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: @space-4;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: @space-2;
+}
+
+// "Aggiungi": stessa forma a pillola degli altri controlli della barra
+.toolbar :global(.btn) {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+input.search {
+  flex: 1 1 200px;
+  width: auto;
+}
+
+.quick-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--c-gold);
+  }
+}
+
+.quick-toggle-on {
+  border-color: var(--c-gold);
+  background: color-mix(in srgb, var(--c-gold) 18%, var(--surface));
+  color: var(--c-gold);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--c-gold) 35%, transparent);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--frame);
+}
+
+// --- Riga di un potere -------------------------------------------------------------
+.item {
+  border-bottom: 1px solid color-mix(in srgb, var(--frame-soft) 55%, transparent);
+
+  // Freccia della descrizione: tenue, piena al passaggio
+  &:hover .expand,
+  .expand[aria-expanded='true'] {
+    opacity: 1;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: stretch;
+}
+
+// Nome e dati quieti a sinistra, i quattro numeri in colonna a destra
+.grid {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 16px;
+  align-items: center;
+  gap: @space-3;
+  padding: 10px @space-2 10px @space-3;
+  border-radius: @radius-sm;
+
+  @media @bp-mobile {
+    grid-template-columns: minmax(0, 1fr);
+    gap: @space-2;
+    padding: 10px 4px 10px @space-2;
+  }
+}
+
+.rollable {
+  .rollable();
+
+  // Il dado compare solo passando sopra la riga
+  &:hover .dice,
+  &:focus-visible .dice {
+    opacity: 1;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px @space-2;
+  min-width: 0;
+}
+
+.name {
+  font-family: @font-display;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.badge-special,
+.badge-granted {
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 17px;
+  white-space: nowrap;
+}
+
+.badge-special {
+  background: var(--ribbon);
+  color: var(--ribbon-text);
+}
+
+.badge-granted {
+  border: 1px solid color-mix(in srgb, var(--info) 60%, transparent);
+  color: var(--info);
+}
+
+// Raggio, area, durata: una riga tenue
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+
+  b {
+    font-weight: 600;
+    color: var(--text-soft);
+  }
+}
+
+// Avanzamento: linea sottile, numeri piccoli e quieti
+.progress-line {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+  max-width: 260px;
+  margin-top: 2px;
+
+  > [role='progressbar'] {
+    flex: 1;
+    height: 3px;
+    box-shadow: none;
+  }
+}
+
+.progress-text {
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.advance {
+  max-width: 280px;
+}
+
+// I quattro numeri in linea: "Liv 4  Riuscita 6  Costo 15  Lancio 3" (niente tabella)
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px 16px;
+
+  @media @bp-mobile {
+    justify-content: flex-start;
+  }
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+
+  small {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  b {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    gap: 4px;
+    white-space: nowrap;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// Il livello pesa di più
+.stat-strong b {
+  font-family: @font-display;
+  font-size: 23px;
+  line-height: 1;
+}
+
+.stat-muted b {
+  color: var(--text-muted);
+}
+
+.stat-quick b {
+  color: var(--c-gold);
+}
+
+// Potere al massimo: la scritta MAX sta dove sarebbe la barra di avanzamento
+.max-line {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 16px;
+}
+
+.dice {
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 0.12s;
+
+  @media @bp-mobile {
+    display: none;
+  }
+}
+
+.expand {
+  flex: none;
+  width: 32px;
+  border: 0;
+  border-radius: @radius-sm;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0.35;
+  transition: opacity 0.12s;
+
+  &:hover {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+
+  // Senza mouse non c'è passaggio: un po' più visibile
+  @media (hover: none) {
+    opacity: 0.6;
+  }
+}
+
+// --- Modifica -------------------------------------------------------------------
+.edit-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: @space-2;
+  padding: 4px @space-3 8px;
+}
+
+.acquisition {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: auto;
+  .sheet-label();
+
+  button {
+    font-size: 15px;
+    color: var(--text);
+  }
+}
+
+// --- Descrizione ------------------------------------------------------------------
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+  margin: 0 @space-2 @space-3;
+  padding: @space-3;
+  border-left: 3px solid var(--frame);
+  border-radius: 0 @radius-sm @radius-sm 0;
+  background: var(--surface-2);
+  font-size: 14.5px;
+
+  p {
+    margin: 0;
+    white-space: pre-line;
+  }
+}
+
+.detail-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: @space-2 @space-4;
+}
+
+.detail-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+// Interruttore MAX nel dettaglio
+.max-toggle {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
+}
+
+.max-toggle-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-contrast);
+
+  &:hover {
+    color: var(--accent-contrast);
+  }
+}
+
+// Numeri modificabili con un clic (livello, riuscita per il Master)
+.editable {
+  min-width: 1.2em;
+  padding: 0 2px;
+  font: inherit;
+  color: inherit;
+}
+
+.meta {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+// Aperta: riga e dettaglio sono una scheda sola
+.item-open {
+  .open-item();
+}

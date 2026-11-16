@@ -1,0 +1,187 @@
+@import '../../../styles/tokens.less';
+
+.box {
+  .sheet-box();
+  padding: @space-5 @space-3 @space-3;
+  min-width: 0;
+}
+
+.caption {
+  .sheet-caption();
+}
+
+// --- Caratteristiche -----------------------------------------------------------
+.attributes {
+  display: flex;
+  flex-direction: column;
+}
+
+// Riga: nome (con avanzamento sottile sotto) · dado al passaggio · Val · Mod · domanda
+.attribute {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px auto auto 28px;
+  align-items: center;
+  gap: @space-2;
+  padding: 9px 4px 9px @space-2;
+  border-radius: @radius-sm;
+  .rollable();
+
+  & + & {
+    border-top: 1px solid color-mix(in srgb, var(--frame-soft) 55%, transparent);
+  }
+
+  // Dado e domanda compaiono solo passando sopra la riga
+  &:hover .dice,
+  &:focus-visible .dice,
+  &:hover .ask {
+    opacity: 1;
+  }
+}
+
+// Domanda al Master: tenue, piena al passaggio
+.ask {
+  opacity: 0.35;
+  transition: opacity 0.12s;
+
+  @media (hover: none) {
+    opacity: 0.6;
+  }
+}
+
+// "Val 15", "Mod +1": etichetta piccola accanto al numero
+.pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  > small {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.attribute-name {
+  font-family: @font-display;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Valore: modificabile con un clic (bordo tratteggiato al passaggio)
+.value {
+  min-width: 1.4em;
+  padding: 0 2px;
+  font-family: @font-display;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+// Modificatore: testo semplice, niente ovale
+.modifier {
+  justify-self: center;
+  min-width: 1.6em;
+  color: var(--accent-strong);
+  font-family: @font-display;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.progress-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dice {
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+// --- Sbloccabili ---------------------------------------------------------------
+.unlocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 3px 10px;
+    border: 1px solid var(--success);
+    border-radius: 999px;
+    color: var(--success);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  small {
+    font-weight: 400;
+    opacity: 0.8;
+  }
+}
+
+// --- Equipaggiato --------------------------------------------------------------
+.equipped {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: @space-2;
+    padding: 6px @space-2;
+
+    & + li {
+      border-top: 1px solid var(--frame-soft);
+    }
+  }
+}
+
+.slot-icon {
+  color: var(--accent);
+}
+
+.item-name {
+  min-width: 0;
+  font-weight: 600;
+}
+
+.empty {
+  margin: 0;
+  color: var(--text-muted);
+}

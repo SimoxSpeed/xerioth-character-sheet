@@ -1,0 +1,651 @@
+@import '../../../styles/tokens.less';
+
+// ===========================================================================
+// Desktop / tablet: targhetta (sinistra) + parametri vitali su una fila (destra)
+// ===========================================================================
+.header {
+  .sheet-box();
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: @space-5;
+  padding: @space-4 @space-5;
+
+  // Sotto i 1300 px la targhetta sta sopra e i parametri vitali sotto, sempre su una fila
+  @media (max-width: 1299px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: @space-3;
+    padding: @space-3 @space-4;
+  }
+
+  @media @bp-mobile {
+    display: none;
+  }
+}
+
+// In modalità Modifica la scheda lo dice da sé: cornice tratteggiata
+.header-editing {
+  outline: 2px dashed var(--ribbon);
+  outline-offset: -8px;
+}
+
+// --- Targhetta ---------------------------------------------------------------
+.nameplate {
+  display: flex;
+  align-items: center;
+  gap: @space-4;
+  min-width: 0;
+}
+
+.portrait {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 3px solid var(--frame);
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 4px var(--frame-soft),
+    var(--shadow);
+  background: radial-gradient(circle at 35% 30%, var(--surface), var(--surface-2));
+  overflow: hidden;
+  font-family: @font-display;
+  font-size: 40px;
+  color: var(--accent);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 1299px) {
+    width: 64px;
+    height: 64px;
+    font-size: 30px;
+  }
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: @space-3;
+}
+
+.name {
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  text-shadow: 0 1px 0 var(--surface);
+  overflow-wrap: anywhere;
+}
+
+// Classe · Razza · Allineamento
+.lineage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent);
+
+  span:not(:last-child)::after {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin: 0 10px;
+    vertical-align: middle;
+    background: var(--frame);
+    transform: rotate(45deg);
+  }
+}
+
+// Aspetto: tutti i valori a vista, su una riga che va a capo
+.looks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin: 0;
+  padding: 4px 0;
+  border-top: 1px solid var(--frame-soft);
+  border-bottom: 1px solid var(--frame-soft);
+}
+
+.look {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+
+  dt {
+    .sheet-label();
+  }
+
+  dd {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+
+    small {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    // NumberField/TextField disabilitati sembrano testo
+    button {
+      min-width: 0;
+      padding: 0;
+      font-weight: 600;
+    }
+  }
+}
+
+// Livello + barra dell'esperienza: tutta la riga apre la finestra
+.level-row {
+  display: flex;
+  align-items: center;
+  gap: @space-3;
+  width: 100%;
+  padding: 4px 10px;
+  border: 1px solid var(--frame-soft);
+  border-radius: @radius-sm;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    border-color: var(--c-xp);
+  }
+}
+
+.level {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: var(--c-xp);
+
+  small {
+    .sheet-label();
+    color: var(--c-xp);
+  }
+
+  strong {
+    font-family: @font-display;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  :global(.lucide) {
+    align-self: center;
+  }
+}
+
+.xp-track {
+  flex: 1;
+  min-width: 60px;
+}
+
+.xp-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  small {
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  :global(.lucide) {
+    align-self: center;
+    color: var(--c-xp);
+  }
+}
+
+.level-up {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--success);
+  color: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+// --- Modifica ---------------------------------------------------------------
+.edit-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--frame);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  @media @bp-mobile {
+    padding: 7px 10px;
+  }
+}
+
+.edit-toggle-on {
+  background: var(--ribbon);
+  border-color: var(--ribbon);
+  color: var(--ribbon-text);
+
+  &:hover {
+    color: var(--ribbon-text);
+  }
+}
+
+.edit-label {
+  @media @bp-mobile {
+    display: none;
+  }
+}
+
+// ===========================================================================
+// Parametri vitali: una fila sola (PF più largo)
+// ===========================================================================
+.vitals {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: minmax(170px, 1.6fr);
+  grid-auto-columns: minmax(0, 1fr);
+  gap: @space-2;
+  min-width: 0;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: @space-2 @space-3;
+  border: 1px solid color-mix(in srgb, var(--tone, var(--frame)) 45%, var(--border));
+  border-top: 3px solid var(--tone, var(--frame));
+  border-radius: @radius-sm;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--tone, var(--accent)) 9%, transparent), transparent 70%),
+    var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.08s,
+    box-shadow 0.12s;
+
+  &:hover {
+    box-shadow: 0 0 0 1px var(--tone, var(--accent));
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.tile-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  .sheet-label();
+  color: var(--tone, var(--text-muted));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile-value {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 4px;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+
+  strong {
+    font-family: @font-display;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--tone, var(--text));
+  }
+
+  small {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+}
+
+.hp-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+  border-radius: @radius-sm;
+
+  strong {
+    font-family: @font-display;
+    font-size: 44px;
+    line-height: 1;
+    color: var(--c-hp);
+  }
+
+  small {
+    font-family: @font-display;
+    font-size: 20px;
+    color: var(--text-soft);
+  }
+}
+
+.down {
+  color: var(--danger) !important;
+}
+
+.temp {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--hp-temp) 18%, transparent);
+  color: var(--hp-temp);
+  font-weight: 700;
+  align-self: center;
+}
+
+.hp-parts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+
+  b {
+    color: var(--text-soft);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// Danno e cura: il numero lampeggia
+.flash-damage {
+  animation: flash-damage 0.6s ease-out;
+}
+
+.flash-heal {
+  animation: flash-heal 0.6s ease-out;
+}
+
+@keyframes flash-damage {
+  0% {
+    background: color-mix(in srgb, var(--c-hp) 45%, transparent);
+    transform: translateX(-4px);
+  }
+  20% {
+    transform: translateX(4px);
+  }
+  40% {
+    transform: translateX(-2px);
+  }
+  100% {
+    background: transparent;
+    transform: none;
+  }
+}
+
+@keyframes flash-heal {
+  0% {
+    background: color-mix(in srgb, var(--success) 40%, transparent);
+    transform: scale(1.06);
+  }
+  100% {
+    background: transparent;
+    transform: none;
+  }
+}
+
+// Follia, Fato: − e + sempre visibili
+.counter-tile {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  cursor: default;
+}
+
+.tile-open {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  align-self: stretch;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.counter-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 26px;
+    border: 1px solid color-mix(in srgb, var(--tone) 50%, var(--border));
+    border-radius: @radius-sm;
+    background: var(--surface);
+    color: var(--tone);
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--tone) 14%, var(--surface));
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+}
+
+// ===========================================================================
+// Telefono: fascia compatta fissa
+// ===========================================================================
+.band {
+  display: none;
+
+  @media @bp-mobile {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px @space-3;
+    background: var(--grain), var(--surface);
+    border-bottom: 2px solid var(--frame);
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.15);
+  }
+}
+
+.band-top {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+}
+
+.band-id {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.band-portrait {
+  .portrait();
+  width: 40px !important;
+  height: 40px !important;
+  border-width: 2px;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--frame-soft);
+  font-size: 20px !important;
+}
+
+.band-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.band-name {
+  font-family: @font-display;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.band-level {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--c-xp);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.band-xp {
+  flex: 1;
+  max-width: 140px;
+}
+
+.band-chevron {
+  color: var(--text-muted);
+}
+
+.band-hp {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in srgb, var(--c-hp) 45%, var(--border));
+  border-left: 4px solid var(--c-hp);
+  border-radius: @radius-sm;
+  background: color-mix(in srgb, var(--c-hp) 7%, var(--surface));
+  color: var(--c-hp);
+  font: inherit;
+  cursor: pointer;
+}
+
+.band-hp-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    font-family: @font-display;
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  small {
+    color: var(--text-soft);
+    font-size: 14px;
+  }
+}
+
+.band-hp-bar {
+  flex: 1;
+}
+
+.band-chips {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, auto);
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 5px 9px;
+  border: 1px solid color-mix(in srgb, var(--tone) 50%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tone) 10%, var(--surface));
+  color: var(--tone);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.band-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--frame-soft);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.6;
+  }
+}

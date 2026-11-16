@@ -1,0 +1,145 @@
+@import '../../../../styles/tokens.less';
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: @space-3;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: @space-3;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+  margin: 0;
+  font-size: 17px;
+}
+
+.hint {
+  margin: 2px 0 @space-2;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.breakdown {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: @space-3;
+    padding: 3px 0;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.zero {
+  color: var(--text-muted);
+}
+
+.total {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: @space-2;
+
+  input {
+    flex: 1 1 200px;
+    width: auto;
+  }
+
+  select {
+    flex: 0 1 220px;
+    width: auto;
+  }
+}
+
+.table-wrap {
+  .card();
+  padding: 0;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    .label-caps();
+    text-align: left;
+    padding: @space-2 @space-3;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 6px @space-3;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+}
+
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  display: block;
+  font-weight: 500;
+}
+
+.group {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.attr-badge {
+  .label-caps();
+  font-size: 11px;
+  cursor: help;
+}
+
+.teacher {
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: @radius-sm;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.progress-cell {
+  min-width: 170px;
+}
+
+.empty {
+  padding: @space-4;
+  margin: 0;
+}
+
+// Le intestazioni delle colonne numeriche seguono i numeri (a destra)
+.table th.num {
+  text-align: right;
+}

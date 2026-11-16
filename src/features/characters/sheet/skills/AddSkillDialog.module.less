@@ -1,0 +1,159 @@
+@import '../../../../styles/tokens.less';
+
+.modes {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: @space-3;
+  border: 1px solid var(--border);
+  border-radius: @radius-sm;
+  overflow: hidden;
+}
+
+.mode {
+  padding: 6px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  cursor: pointer;
+}
+
+.mode-active {
+  .mode();
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.catalog {
+  display: flex;
+  flex-direction: column;
+  gap: @space-3;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: @space-2;
+
+  input[type='search'] {
+    flex: 1 1 200px;
+    width: auto;
+  }
+
+  select {
+    flex: 0 1 160px;
+    width: auto;
+  }
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+}
+
+.entry {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: @space-3;
+  padding: @space-3;
+  border: 1px solid var(--border);
+  border-radius: @radius-sm;
+  background: var(--surface-2);
+}
+
+.entry-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.entry-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: @space-2;
+}
+
+.attr {
+  .label-caps();
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: @radius-sm;
+}
+
+.max {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.description {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.requirements {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  li {
+    padding: 1px 8px;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    font-size: 12px;
+  }
+}
+
+.req-met {
+  color: var(--success);
+}
+
+.req-missing {
+  color: var(--danger);
+}
+
+.req-note {
+  color: var(--info);
+}
+
+.custom {
+  display: flex;
+  flex-direction: column;
+  gap: @space-3;
+
+  p {
+    margin: 0;
+  }
+}
+
+.custom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: @space-3;
+}
+
+.custom-actions {
+  display: flex;
+  justify-content: flex-end;
+}
