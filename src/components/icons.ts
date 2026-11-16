@@ -58,6 +58,7 @@ export {
   WandSparkles as PowersIcon,
 } from 'lucide-react'
 export type { LucideIcon } from 'lucide-react'
+export { GoogleIcon } from './GoogleIcon'
 
 import { Brain, Droplets, Flame, Sparkles, type LucideIcon as Icon } from 'lucide-react'
 

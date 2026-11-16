@@ -78,7 +78,7 @@ erDiagram
 
 ### 2.1 Utenti, campagne e Master
 
-**`profiles`**: una riga per utente, creata in automatico alla registrazione.
+**`profiles`**: una riga per utente, creata in automatico alla registrazione (trigger `handle_new_user`). `display_name` viene, nell'ordine, dal nome scritto alla registrazione con email, dal nome dell'account Google (`full_name` / `name`), dalla parte dell'email prima della `@`.
 | Colonna | Tipo |
 |---|---|
 | `id` | uuid PK (= `auth.users.id`) |

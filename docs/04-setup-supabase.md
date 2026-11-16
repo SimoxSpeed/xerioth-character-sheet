@@ -55,7 +55,8 @@ Senza MCP si possono comunque applicare a mano: *SQL Editor → New query*, inco
 
 *Authentication*:
 - **Sign In / Providers → Email**: attivo (è il default).
-- **URL Configuration**: Site URL `http://localhost:5173`; in Redirect URLs aggiungi `http://localhost:5173/**`.
+- **Sign In / Providers → Google**: vedi [06-pubblicazione.md](06-pubblicazione.md#accesso-con-google).
+- **URL Configuration**: Site URL e Redirect URLs come in [06-pubblicazione.md](06-pubblicazione.md#passo-2--supabase-tu-dalla-dashboard).
 - In sviluppo è comodo disattivare **Confirm email**.
 
 ## Passo 6 — Campagna e ruolo Master *(io via MCP, oppure tu da SQL Editor)*
@@ -81,4 +82,4 @@ npm run dev     # http://localhost:5173
 
 ## Pubblicazione online
 
-Cloudflare Pages: [06-pubblicazione.md](06-pubblicazione.md).
+Cloudflare Pages e accesso con Google: [06-pubblicazione.md](06-pubblicazione.md).

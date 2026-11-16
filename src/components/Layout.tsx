@@ -8,7 +8,8 @@ export function Layout() {
   const { user, signOut } = useAuth()
   // La scheda personaggio occupa tutta la pagina.
   const isSheet = useMatch('/personaggi/:characterId') !== null
-  const name = (user?.user_metadata?.display_name as string | undefined) || user?.email
+  const meta = user?.user_metadata as { display_name?: string; full_name?: string } | undefined
+  const name = meta?.display_name || meta?.full_name || user?.email
 
   return (
     <div className={isSheet ? styles.shellFixed : styles.shell}>

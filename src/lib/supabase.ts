@@ -10,7 +10,10 @@ if (!url || !key) {
   )
 }
 
-export const supabase = createClient<Database>(url, key)
+export const supabase = createClient<Database>(url, key, {
+  // PKCE: al ritorno da Google arriva un ?code= che il client scambia da solo per la sessione.
+  auth: { flowType: 'pkce' },
+})
 
 /**
  * Lancia l'errore di Supabase (se presente) per farlo gestire da TanStack Query.

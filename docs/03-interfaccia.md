@@ -8,7 +8,7 @@ Lingua: italiano. Pensata per il **tavolo da gioco**: portatile e telefono hanno
 
 | Percorso | Pagina | Chi |
 |---|---|---|
-| `/accesso` | Login con email + password | tutti |
+| `/accesso` | Accedi con Google, oppure email + password | tutti |
 | `/` | **Le mie campagne e i miei personaggi** (il Master vede tutti i personaggi della sua campagna) | tutti |
 | `/personaggi/:id` | **Scheda personaggio** | proprietario, Master |
 | `/master` | **Pannello Master** (Fase 2) | Master |

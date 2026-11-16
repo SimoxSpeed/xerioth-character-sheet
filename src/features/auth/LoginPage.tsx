@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router'
+import { GoogleIcon } from '../../components/icons'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from './AuthProvider'
 import styles from './LoginPage.module.less'
@@ -21,6 +22,21 @@ export function LoginPage() {
   const [busy, setBusy] = useState(false)
 
   if (user) return <Navigate to={from} replace />
+
+  async function handleGoogle() {
+    setError(null)
+    setInfo(null)
+    setBusy(true)
+    // In caso di successo il browser va su Google: busy resta attivo fino al cambio pagina.
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}${from}` },
+    })
+    if (error) {
+      setError(translateAuthError(error.message))
+      setBusy(false)
+    }
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -55,6 +71,15 @@ export function LoginPage() {
           <h1>Xerioth</h1>
           <p className="muted">Schede dei personaggi</p>
         </header>
+
+        <button className="btn" type="button" onClick={handleGoogle} disabled={busy}>
+          <GoogleIcon />
+          Accedi con Google
+        </button>
+
+        <div className={styles.divider} aria-hidden="true">
+          <span>oppure</span>
+        </div>
 
         <div className={styles.tabs} role="tablist">
           <button
