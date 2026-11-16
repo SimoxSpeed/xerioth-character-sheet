@@ -1,0 +1,433 @@
+@import '../../styles/tokens.less';
+
+.roller {
+  display: flex;
+  flex-direction: column;
+  gap: @space-4;
+
+  p {
+    margin: 0;
+  }
+}
+
+// Dati di riferimento: caratteristica, modificatore, livello, dado riuscita
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: @space-2;
+  margin: 0;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: @space-2;
+    border: 1px solid var(--frame-soft);
+    border-radius: @radius-sm;
+    background: var(--surface-2);
+    text-align: center;
+  }
+
+  dt {
+    .sheet-label();
+  }
+
+  dd {
+    margin: 0;
+    font-family: @font-display;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.extra {
+  font-family: @font-body;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.roll-button {
+  align-self: center;
+  min-width: 220px;
+  padding: 12px 20px;
+  font-size: 17px;
+  font-weight: 700;
+
+  :global(.lucide) {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: @space-4;
+}
+
+.inline {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: @space-2;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+// più specifico di .input (width: 100%)
+input.physical {
+  width: 72px;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: @space-2;
+  text-align: center;
+}
+
+// --- Faccia del d20 ---------------------------------------------------------
+.die {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 128px;
+  height: 128px;
+  --die-fill: var(--surface-2);
+  --die-stroke: var(--frame);
+  --die-text: var(--text);
+}
+
+.die-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.25));
+
+  polygon {
+    fill: var(--die-fill);
+    stroke: var(--die-stroke);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+}
+
+.die-facet {
+  fill: color-mix(in srgb, var(--die-fill) 80%, white) !important;
+  stroke-width: 1.5 !important;
+}
+
+.die-edge {
+  fill: none;
+  stroke: var(--die-stroke);
+  stroke-width: 1.5;
+  opacity: 0.6;
+}
+
+.die-value {
+  position: relative;
+  top: 6px;
+  font-family: @font-display;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--die-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.die-rolling {
+  animation: die-tumble 0.45s ease-out;
+  --die-text: var(--text-muted);
+}
+
+.die-neutral {
+  --die-fill: var(--accent-soft);
+  --die-stroke: var(--accent);
+  --die-text: var(--accent-strong);
+  animation: die-land 0.25s ease-out;
+}
+
+.die-success {
+  --die-fill: color-mix(in srgb, var(--success) 22%, var(--surface));
+  --die-stroke: var(--success);
+  --die-text: var(--success);
+  animation: die-land 0.25s ease-out;
+}
+
+.die-failure {
+  --die-fill: color-mix(in srgb, var(--danger) 18%, var(--surface));
+  --die-stroke: var(--danger);
+  --die-text: var(--danger);
+  animation: die-shake 0.35s ease-out;
+}
+
+// 20 e 1 naturali
+.crit .die-shape {
+  filter: drop-shadow(0 0 14px var(--gold));
+}
+
+.fumble .die-value {
+  text-decoration: underline wavy;
+  text-decoration-thickness: 2px;
+}
+
+@keyframes die-tumble {
+  0% {
+    transform: rotate(-160deg) scale(0.6);
+  }
+  70% {
+    transform: rotate(12deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(0) scale(1);
+  }
+}
+
+@keyframes die-land {
+  0% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes die-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px) rotate(-3deg);
+  }
+  50% {
+    transform: translateX(5px) rotate(2deg);
+  }
+  75% {
+    transform: translateX(-3px);
+  }
+}
+
+.result-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.succeeded,
+.failed {
+  font-family: @font-display;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.succeeded {
+  color: var(--success);
+}
+
+.failed {
+  color: var(--danger);
+}
+
+.outcomes {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+}
+
+.picked-success {
+  background: var(--success) !important;
+  border-color: var(--success) !important;
+  color: var(--surface) !important;
+}
+
+.picked-failure {
+  background: var(--danger) !important;
+  border-color: var(--danger) !important;
+  color: var(--surface) !important;
+}
+
+
+// Sopra / Sotto al posto del numero
+.die-text {
+  top: 4px;
+  font-size: 22px;
+}
+
+// --- Tiro libero ----------------------------------------------------------------
+.dice-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.die-chip {
+  min-width: 52px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-family: @font-body;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+}
+
+.die-chip-on {
+  .die-chip();
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+
+  &:hover {
+    color: var(--accent-strong);
+  }
+}
+
+.free-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: @space-3;
+
+  .roll-button {
+    min-width: 180px;
+  }
+}
+
+// Quanti dadi: − 3 +
+.count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  b {
+    min-width: 1.6em;
+    font-family: @font-display;
+    font-size: 22px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--text-soft);
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+}
+
+// --- Dado e totale ----------------------------------------------------------------
+// Il dado rotola al centro; fermo, scivola a sinistra e a destra sale il totale.
+@stage-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  height: 136px;
+  margin: 0 auto;
+}
+
+.stage-die {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  transform-origin: left center;
+  transition:
+    left 0.45s @stage-ease,
+    transform 0.45s @stage-ease;
+}
+
+.stage-settled .stage-die {
+  left: 0;
+  transform: translateX(0) scale(0.74);
+}
+
+.total {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 62%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transform: translate(28px, -50%);
+  transition:
+    opacity 0.3s 0.12s,
+    transform 0.45s 0.08s @stage-ease;
+  pointer-events: none;
+
+  small {
+    .sheet-label();
+  }
+
+  b {
+    font-family: @font-display;
+    font-size: 76px;
+    font-weight: 700;
+    line-height: 0.95;
+    color: var(--total-color, var(--text));
+    font-variant-numeric: tabular-nums;
+    transition: color 0.2s;
+  }
+}
+
+.stage-settled .total {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.total-success {
+  --total-color: var(--success);
+}
+
+.total-failure {
+  --total-color: var(--danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-die,
+  .total {
+    transition: none;
+  }
+}
