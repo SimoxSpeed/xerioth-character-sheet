@@ -1,0 +1,91 @@
+@import '../styles/tokens.less';
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: @space-4;
+  padding: @space-2 @space-5;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+
+  @media @bp-mobile {
+    padding: @space-2 @space-4;
+  }
+}
+
+.brand {
+  font-family: @font-display;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+}
+
+.user {
+  color: var(--text-soft);
+  font-size: 13px;
+
+  @media @bp-mobile {
+    display: none;
+  }
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: @space-5;
+
+  @media @bp-mobile {
+    padding: @space-4;
+  }
+}
+
+// Scheda: la pagina non scorre mai, occupa esattamente lo schermo;
+// scorrono solo le sezioni al suo interno.
+.shell-fixed {
+  .shell();
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.topbar-static {
+  .topbar();
+  position: static;
+  flex: none;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.content-wide {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: @space-4 @space-5;
+  overflow: hidden;
+
+  @media @bp-mobile {
+    padding: 0;
+  }
+}
