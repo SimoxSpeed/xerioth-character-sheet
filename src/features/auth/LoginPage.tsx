@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import { GoogleIcon } from '../../components/icons'
 import { ThemeToggle } from '../../components/ThemeToggle'
 import { supabase } from '../../lib/supabase'
@@ -150,6 +150,10 @@ export function LoginPage() {
         <button className="btn btn--primary" type="submit" disabled={busy}>
           {busy ? 'Attendere…' : mode === 'login' ? 'Accedi' : 'Crea account'}
         </button>
+
+        <Link to="/privacy" className={styles.privacy}>
+          Privacy
+        </Link>
       </form>
     </main>
   )

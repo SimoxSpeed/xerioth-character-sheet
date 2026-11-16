@@ -49,9 +49,12 @@ Flusso: l'app manda a Google → Google torna su `https://rratuwwmqgvkvyvvpqiy.s
 
 1. <https://console.cloud.google.com> → nuovo progetto `Xerioth`.
 2. **Google Auth Platform → Branding**:
-   - App name `Xerioth`, email di supporto tua;
-   - **Authorized domains**: `rratuwwmqgvkvyvvpqiy.supabase.co`.
-3. **Audience**: *External*. Poi **Publish app** (stato *In production*). Con i soli permessi base non serve la verifica di Google; in stato *Testing* invece entrerebbero solo gli indirizzi aggiunti a mano come test user.
+   - App name `Xerioth`, email di supporto tua, email di contatto dello sviluppatore;
+   - **Application home page**: `https://xerioth.pages.dev`;
+   - **Application privacy policy link**: `https://xerioth.pages.dev/privacy`;
+   - **Authorized domains**: `rratuwwmqgvkvyvvpqiy.supabase.co` e `xerioth.pages.dev`;
+   - niente logo (farebbe scattare la verifica di Google).
+3. **Audience**: *External*. Poi **Publish app** (stato *In production*): senza home page e privacy policy il pulsante resta disattivato. Con i soli permessi base non serve la verifica di Google; in stato *Testing* invece entrerebbero solo gli indirizzi aggiunti a mano come test user.
 4. **Data Access**: solo `openid`, `.../auth/userinfo.email`, `.../auth/userinfo.profile`.
 5. **Clients → Create client** → *Web application*:
    - **Authorized JavaScript origins**: `http://localhost:5173`, `https://xerioth.pages.dev`
@@ -72,6 +75,7 @@ Nella schermata di consenso Google mostrerà "accedi a rratuwwmqgvkvyvvpqiy.supa
 ### Nell'app
 
 - **Pagina di accesso**: pulsante **Accedi con Google** in cima, poi "oppure" e il form email e password (resta attivo). Il logo "G" è un SVG in `components/GoogleIcon.tsx`, esportato da `icons.ts` (lucide non ha i loghi dei marchi). Al ritorno da Google si torna alla pagina da cui si era partiti.
+- **Privacy**: pagina pubblica `/privacy` (cosa si salva, chi lo vede, dove, cancellazione), linkata in fondo alla pagina di accesso. È l'indirizzo da dare a Google nel Branding.
 - **Client Supabase**: flusso `pkce`.
 - **Profilo**: il nome visualizzato arriva dall'account Google (vedi `profiles` in [02-database.md](02-database.md)).
 

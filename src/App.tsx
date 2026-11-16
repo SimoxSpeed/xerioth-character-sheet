@@ -5,12 +5,14 @@ import { RequireAuth } from './features/auth/RequireAuth'
 import { HomePage } from './features/characters/HomePage'
 import { NewCharacterPage } from './features/characters/NewCharacterPage'
 import { CharacterSheetPage } from './features/characters/sheet/CharacterSheetPage'
+import { PrivacyPage } from './features/legal/PrivacyPage'
 import { MasterPanelPage } from './features/master/MasterPanelPage'
 
 export function App() {
   return (
     <Routes>
       <Route path="/accesso" element={<LoginPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
       <Route
         element={
           <RequireAuth>
