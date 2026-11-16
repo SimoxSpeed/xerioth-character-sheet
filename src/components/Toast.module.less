@@ -1,0 +1,76 @@
+@import '../styles/tokens.less';
+
+// Sopra la barra di navigazione della scheda su mobile.
+.region {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--bottom-nav-h, 0px) + 16px + env(safe-area-inset-bottom));
+  z-index: 50;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: @space-2;
+  padding: 6px 6px 6px 16px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.35);
+  pointer-events: auto;
+  animation: toast-in 0.18s ease-out;
+}
+
+.message {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.undo,
+.close {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.undo {
+  padding: 4px 10px;
+  color: var(--accent-strong);
+  font-weight: 700;
+  filter: brightness(1.35);
+
+  &:hover {
+    background: rgb(127 127 127 / 0.18);
+  }
+}
+
+.close {
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

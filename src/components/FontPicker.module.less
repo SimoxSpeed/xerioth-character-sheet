@@ -1,0 +1,36 @@
+@import '../styles/tokens.less';
+
+.picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-soft);
+
+  :global(.lucide) {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.select {
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: @radius-sm;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    border-color: var(--border);
+    color: var(--text);
+    outline: none;
+  }
+
+  option {
+    background: var(--surface);
+    color: var(--text);
+  }
+}

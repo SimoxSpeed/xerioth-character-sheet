@@ -1,0 +1,97 @@
+@import '../styles/tokens.less';
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  min-height: 22px;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.adjust-button {
+  flex: none;
+  height: 22px;
+  padding: 0 4px;
+  gap: 0;
+
+  :global(.lucide) {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+// "Quanti punti": compatto, nella stessa riga di ciò che modifica
+.adjust {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 1px;
+
+  :global(.btn--square) {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-soft);
+
+    &:hover {
+      border-color: var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    :global(.lucide) {
+      width: 13px;
+      height: 13px;
+    }
+  }
+
+  // Aggiungi: l'azione principale (anche con Invio)
+  :global(.btn--primary) {
+    color: var(--accent-strong);
+  }
+}
+
+// Stessa "matita" dei numeri modificabili: sottolineatura, niente riquadro
+.amount {
+  width: 5ch;
+  min-width: 0;
+  margin-right: 2px;
+  padding: 1px 4px;
+  border: 0;
+  border-radius: 3px 3px 0 0;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  box-shadow: inset 0 -2px 0 var(--accent);
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}

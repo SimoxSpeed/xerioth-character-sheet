@@ -1,0 +1,137 @@
+// Variabili LESS per valori di layout. I colori sono variabili CSS (cambiano col tema).
+
+@radius-sm: 6px;
+@radius: 10px;
+@radius-lg: 14px;
+
+@space-1: 4px;
+@space-2: 8px;
+@space-3: 12px;
+@space-4: 16px;
+@space-5: 24px;
+@space-6: 32px;
+
+// I caratteri si scelgono dall'intestazione (src/styles/fonts.ts): qui solo le variabili CSS.
+@font-display: var(--font-display, 'Alegreya SC', Georgia, serif);
+@font-body: var(--font-body, 'Alegreya Sans', system-ui, sans-serif);
+
+@bp-mobile: ~'(max-width: 720px)';
+@bp-sheet-narrow: ~'(max-width: 1099px)';
+@bp-sheet-wide: ~'(min-width: 1100px)';
+
+.card() {
+  background: var(--grain), var(--surface);
+  border: 1px solid var(--border);
+  border-radius: @radius;
+  box-shadow: var(--shadow);
+}
+
+.label-caps() {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+// ---------------------------------------------------------------------------
+// Stile "scheda personaggio": riquadri di pergamena con cornice doppia,
+// borchie agli angoli e didascalia a nastro sul bordo.
+// ---------------------------------------------------------------------------
+
+.sheet-box() {
+  position: relative;
+  background:
+    radial-gradient(circle at 7px 7px, var(--frame) 2.6px, transparent 3.2px) top left / 14px 14px no-repeat,
+    radial-gradient(circle at 7px 7px, var(--frame) 2.6px, transparent 3.2px) top right / 14px 14px no-repeat,
+    radial-gradient(circle at 7px 7px, var(--frame) 2.6px, transparent 3.2px) bottom left / 14px 14px no-repeat,
+    radial-gradient(circle at 7px 7px, var(--frame) 2.6px, transparent 3.2px) bottom right / 14px 14px no-repeat,
+    var(--grain),
+    var(--surface);
+  border: 1px solid var(--frame);
+  border-radius: 5px;
+  box-shadow:
+    inset 0 0 0 3px transparent,
+    inset 0 0 0 4px var(--frame-soft),
+    var(--shadow);
+}
+
+// Didascalia a nastro appoggiata sul bordo superiore del riquadro
+.sheet-caption() {
+  position: absolute;
+  top: 0;
+  left: 18px;
+  transform: translateY(-55%);
+  margin: 0;
+  padding: 3px 18px 2px;
+  background: var(--ribbon);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%, 8px 50%);
+  font-family: @font-display;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ribbon-text);
+  line-height: 1.3;
+  white-space: nowrap;
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.3));
+}
+
+// Etichetta piccola sotto il valore, come sotto le righe della scheda cartacea
+.sheet-label() {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+// Elemento "tirabile": tocco = tiro, pressione lunga = opzioni
+.rollable() {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  transition:
+    background 0.12s,
+    transform 0.08s;
+
+  &:hover {
+    background: var(--accent-soft);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+// Voce di elenco aperta (capacità, poteri, oggetti): riga e dettaglio diventano
+// un'unica scheda, tenuta insieme da una banda d'accento a sinistra, così è chiaro
+// a chi appartiene ciò che si è aperto. Va applicata al <li>; il dettaglio è `.detail`.
+.open-item() {
+  position: relative;
+  z-index: 1;
+  margin: 6px 0;
+  border-bottom-color: transparent;
+  border-radius: @radius-sm;
+  background: var(--surface-2);
+  box-shadow:
+    inset 4px 0 0 var(--accent),
+    0 0 0 1px var(--frame-soft),
+    0 4px 12px rgb(0 0 0 / 0.12);
+
+  .name {
+    color: var(--accent-strong);
+  }
+
+  // Il dettaglio prosegue la stessa scheda: niente riquadro proprio
+  .detail {
+    margin: 0 @space-3 0 calc(@space-3 + 4px);
+    padding: @space-3 0;
+    border-left: 0;
+    border-top: 1px dashed var(--frame-soft);
+    border-radius: 0;
+    background: transparent;
+  }
+}

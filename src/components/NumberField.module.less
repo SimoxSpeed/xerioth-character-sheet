@@ -1,0 +1,44 @@
+@import '../styles/tokens.less';
+
+.display {
+  min-width: 2.2em;
+  padding: 0 4px;
+  border: 1px dashed transparent;
+  border-radius: @radius-sm;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: text;
+
+  &:hover:not(:disabled) {
+    border-color: var(--border);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+// In modifica il numero resta grande quanto prima: niente riquadro,
+// solo una sottolineatura "a matita" e un velo di colore.
+// La larghezza segue le cifre (stile in linea da NumberField.tsx).
+.input {
+  box-sizing: content-box;
+  min-width: 1ch;
+  padding: 0 4px;
+  border: 1px solid transparent;
+  border-radius: @radius-sm @radius-sm 0 0;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  box-shadow: inset 0 -2px 0 var(--accent);
+  color: var(--text);
+  font: inherit;
+  text-align: inherit;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}

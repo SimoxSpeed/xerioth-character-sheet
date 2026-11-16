@@ -1,0 +1,329 @@
+@import './tokens.less';
+
+// ---------------------------------------------------------------------------
+// Tema: scuro (cuoio e lume di candela) di default, chiaro (pergamena) con
+// preferenza di sistema o data-theme="light".
+// Ogni risorsa ha il suo colore: PF rosso, Spirito azzurro, Mana blu,
+// Follia viola, Fato verde, Oro dorato, Esperienza ambra.
+// ---------------------------------------------------------------------------
+
+// Grana della carta (rumore SVG), sovrapposta agli sfondi.
+@grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .22 0 0 0 0 .1 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+.theme-dark() {
+  --bg: #15100b;
+  --surface: #211912;
+  --surface-2: #2c2219;
+  --surface-sunk: #1a140e;
+  --border: #46372a;
+  --frame: #8f6d3d;
+  --frame-soft: #4a3a28;
+  --text: #efe3cb;
+  --text-muted: #a08f74;
+  --text-soft: #c2b296;
+  --accent: #dcb063;
+  --accent-strong: #f0c878;
+  --accent-contrast: #1a1408;
+  --accent-soft: rgba(220, 176, 99, 0.15);
+  --ribbon: #8e3324;
+  --ribbon-text: #f6e6c4;
+  --gold: #e6b844;
+  --danger: #e0604c;
+  --success: #77bd77;
+  --info: #7fb0d9;
+  --hp: #e0564a;
+  --hp-temp: #e0a745;
+  --c-hp: #e0564a;
+  --c-spirit: #6fb6e0;
+  --c-mana: #8aa2f2;
+  --c-mind: #e08ad0;
+  --c-soul: #f08a4a;
+  --c-madness: #b88ce8;
+  --c-fate: #74c784;
+  --c-gold: #e6b844;
+  --c-xp: #e39a4f;
+  --focus: #f0c878;
+  --shadow: 0 2px 0 rgb(0 0 0 / 0.35), 0 10px 24px rgb(0 0 0 / 0.3);
+  --page-vignette: radial-gradient(ellipse at 50% 0%, #2a1e13 0%, transparent 70%);
+}
+
+.theme-light() {
+  --bg: #e9dcbf;
+  --surface: #fbf3df;
+  --surface-2: #f1e3c4;
+  --surface-sunk: #f4ead2;
+  --border: #d6c096;
+  --frame: #8d6a3a;
+  --frame-soft: #dcc59a;
+  --text: #2b1d10;
+  --text-muted: #7c6649;
+  --text-soft: #5f4a32;
+  --accent: #93631a;
+  --accent-strong: #774c0c;
+  --accent-contrast: #fffaf0;
+  --accent-soft: rgba(147, 99, 26, 0.13);
+  --ribbon: #7d2b1d;
+  --ribbon-text: #fbeed0;
+  --gold: #a57812;
+  --danger: #b23a28;
+  --success: #3b7c3f;
+  --info: #31658f;
+  --hp: #b3261e;
+  --hp-temp: #b07d1c;
+  --c-hp: #b3261e;
+  --c-spirit: #2a6f9c;
+  --c-mana: #3552a8;
+  --c-mind: #9a2f86;
+  --c-soul: #b9541a;
+  --c-madness: #6a3a9e;
+  --c-fate: #2d7a3d;
+  --c-gold: #9c700c;
+  --c-xp: #b0601a;
+  --focus: #93631a;
+  --shadow: 0 1px 0 rgb(90 60 20 / 0.18), 0 8px 20px rgb(90 60 20 / 0.12);
+  --page-vignette: radial-gradient(ellipse at 50% 0%, #f5ead1 0%, transparent 75%);
+}
+
+:root {
+  .theme-dark();
+  color-scheme: dark;
+  --grain: @grain;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    .theme-light();
+    color-scheme: light;
+  }
+}
+
+:root[data-theme='light'] {
+  .theme-light();
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  .theme-dark();
+  color-scheme: dark;
+}
+
+// ---------------------------------------------------------------------------
+// Base
+// ---------------------------------------------------------------------------
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: @font-body;
+  font-size: 15px;
+  line-height: 1.5;
+  // Alcuni caratteri hanno un solo peso: niente grassetto finto.
+  font-synthesis-weight: none;
+  // Caratteri con minuscole piccole: si ingrandiscono un po' (valore per carattere, in fonts.ts).
+  font-size-adjust: var(--font-adjust, none);
+  // Numeri sempre allineati (alcuni caratteri li hanno "all'antica", con le discendenti).
+  font-feature-settings: 'lnum' 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+html {
+  background-color: var(--bg);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    var(--grain),
+    var(--page-vignette),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3 {
+  font-family: @font-display;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+
+  // I link con aspetto da bottone (.btn) gestiscono da soli i colori.
+  &:not(.btn):hover {
+    color: var(--accent-strong);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+// ---------------------------------------------------------------------------
+// Primitive riutilizzabili
+// ---------------------------------------------------------------------------
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: @space-2;
+  padding: 8px 14px;
+  border-radius: @radius-sm;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.08s;
+
+  &:hover:not(:disabled) {
+    border-color: var(--accent);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  // Bottone principale: bordo e testo nel colore d'accento, sfondo tenue;
+  // si riempie solo al passaggio (niente blocchi pieni né gradienti)
+  &--primary {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-strong);
+
+    &:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-contrast);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    border-color: transparent;
+
+    &:hover:not(:disabled) {
+      background: var(--surface-2);
+      border-color: var(--border);
+    }
+  }
+
+  &--danger {
+    color: var(--danger);
+  }
+
+  &--small {
+    padding: 3px 9px;
+    font-size: 13px;
+  }
+
+  &--icon {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+  }
+
+  // Bottone con sola icona nella riga delle azioni
+  &--square {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+  }
+
+  .lucide {
+    width: 16px;
+    height: 16px;
+  }
+
+  &--pressed {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+// Icone lucide: seguono la dimensione e il colore del testo
+.lucide {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.18em;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: @radius-sm;
+  border: 1px solid var(--border);
+  background: var(--surface-sunk);
+  color: var(--text);
+  font: inherit;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.08);
+
+  &:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+}
+
+.textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: @space-1;
+
+  > span {
+    .label-caps();
+  }
+}
+
+.card {
+  .card();
+  padding: @space-4;
+}
+
+.muted {
+  color: var(--text-soft);
+}
+
+.error-box {
+  padding: @space-3;
+  border-radius: @radius-sm;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  background: transparent;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
