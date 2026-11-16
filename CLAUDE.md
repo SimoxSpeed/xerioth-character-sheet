@@ -1,6 +1,6 @@
 # Xerioth — schede personaggio
 
-App web per le schede del GdR Xerioth, al posto delle schede su Google Sheets. Le decisioni di progetto sono in `docs/` (00–05) e sono la fonte di verità: aggiornale quando cambia una regola, lo schema o l'interfaccia.
+App web per le schede del GdR Xerioth, al posto delle schede su Google Sheets. Le decisioni di progetto sono in `docs/` (00–06) e sono la fonte di verità: aggiornale quando cambia una regola, lo schema o l'interfaccia.
 
 ## Comandi
 

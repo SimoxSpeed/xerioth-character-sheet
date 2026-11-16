@@ -79,6 +79,6 @@ npm run dev     # http://localhost:5173
 
 ---
 
-## Pubblicazione online (più avanti)
+## Pubblicazione online
 
-L'app è un sito statico: si pubblica gratis su Vercel, Netlify o Cloudflare Pages. Poi va aggiunto il suo indirizzo tra i Redirect URLs di Supabase.
+Cloudflare Pages: [06-pubblicazione.md](06-pubblicazione.md).
