@@ -267,7 +267,7 @@ Notifiche: badge con il numero di domande in attesa e aggiornamento in tempo rea
 
 ### 2.4 Tiri di dado
 
-> ✅ **Applicata** il 15/11/2026 (`supabase/migrations/20261115200000_dice_roll_feed.sql`), riscritta senza DROP/DELETE: i tiri nascosti restano nel feed con `hidden = true` e la regola di lettura li esclude.
+> ✅ **Applicata** il 15/11/2026 (`supabase/migrations/20261115190311_dice_roll_feed.sql`), riscritta senza DROP/DELETE: i tiri nascosti restano nel feed con `hidden = true` e la regola di lettura li esclude.
 
 Il gruppo vede di ogni tiro **solo il totale e l'esito** (successo / fallimento / critico negativo). Per questo ci sono due tabelle:
 
@@ -283,7 +283,7 @@ L'esito c'è solo per i poteri e si calcola da solo (totale contro `success_targ
 | `campaign_id` | → campaigns | |
 | `character_id` | → characters | |
 | `label` | text | "Corrosione" |
-| `die` | enum (`d4`, `d6`, `d8`, `d10`, `d12`, `d20`, `d100`, `coin`) | i dadi oltre a d20/d4/coin servono al tiro libero (migrazione `20261116100000_more_dice`) |
+| `die` | enum (`d4`, `d6`, `d8`, `d10`, `d12`, `d20`, `d100`, `coin`) | i dadi oltre a d20/d4/coin servono al tiro libero (migrazione `20261116223918_more_dice`) |
 | `results` | int[] | anche più tiri (critico negativo → ritiro) |
 | `total` | int nullable | null se riuscita decisa dal Master |
 | `details` | jsonb | scomposizione (caratteristica, mod, livello) |
