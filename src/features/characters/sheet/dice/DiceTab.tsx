@@ -1,15 +1,7 @@
 import { DIE_LABELS, coinLabel, rollValuesText } from '../../../../game/rules'
 import { HiddenIcon } from '../../../../components/icons'
 import { FreeRoller } from '../../../dice/DiceRoller'
-import {
-  OUTCOME_LABELS,
-  useCampaignFeed,
-  useCharacterRolls,
-  useSetRollOutcome,
-  type DiceRoll,
-  type FeedRoll,
-  type RollOutcome,
-} from '../../../dice/api'
+import { OUTCOME_LABELS, useCampaignFeed, useCharacterRolls, type DiceRoll, type FeedRoll, type RollOutcome } from '../../../dice/api'
 import { formatDateTime } from '../../../../lib/format'
 import type { CharacterSheet } from '../../api'
 import styles from './DiceTab.module.less'
@@ -38,7 +30,7 @@ export function DiceTab({ sheet }: { sheet: CharacterSheet }) {
 }
 
 export function OutcomeBadge({ outcome }: { outcome: RollOutcome | null }) {
-  if (!outcome) return <span className={styles.noOutcome}>esito non segnato</span>
+  if (!outcome) return null
   return <span className={styles[outcome === 'success' ? 'success' : 'failure']}>{OUTCOME_LABELS[outcome]}</span>
 }
 
@@ -47,14 +39,8 @@ function dieText(roll: Pick<DiceRoll, 'die' | 'results' | 'details'>): string {
   return rollValuesText(roll.die, roll.results, details?.power === true)
 }
 
-function isAutomatic(roll: DiceRoll): boolean {
-  const details = roll.details as { auto_outcome?: boolean } | null
-  return details?.auto_outcome === true
-}
-
 function CharacterHistory({ characterId }: { characterId: string }) {
   const { data: rolls, isPending, error } = useCharacterRolls(characterId)
-  const setOutcome = useSetRollOutcome()
 
   if (isPending) return <p className="muted">Caricamento…</p>
   if (error) return <p className="error-box">{error.message}</p>
@@ -77,20 +63,8 @@ function CharacterHistory({ characterId }: { characterId: string }) {
               )}
             </span>
           </span>
-          {roll.die !== 'd20' ? null : isAutomatic(roll) ? (
-            <OutcomeBadge outcome={roll.outcome} />
-          ) : (
-            <select
-              className={styles.outcomeSelect}
-              value={roll.outcome ?? ''}
-              onChange={(e) => setOutcome.mutate({ id: roll.id, outcome: (e.target.value || null) as RollOutcome | null })}
-              aria-label={`Esito di ${roll.label}`}
-            >
-              <option value="">— esito —</option>
-              <option value="success">{OUTCOME_LABELS.success}</option>
-              <option value="failure">{OUTCOME_LABELS.failure}</option>
-            </select>
-          )}
+          {/* Esito solo dei poteri (automatico): capacità e caratteristiche non hanno classe difficoltà */}
+          {roll.die === 'd20' && <OutcomeBadge outcome={roll.outcome} />}
         </li>
       ))}
     </ul>

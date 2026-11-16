@@ -94,11 +94,21 @@ Destrezza                            Liv 4
 
 ### 3. Poteri (Miracoli / Incantesimi / Poteri mentali)
 - Una linguetta sola; con più tipi di potere si sceglie il tipo in cima. Due classi dello stesso tipo condividono la sezione.
-- Ogni potere è una **riga** (stessa gerarchia delle capacità): nome intero in evidenza (badge "Speciale" / "Vortex"); sotto, tenui, **raggio, area, durata** e la linea dell'avanzamento (al MAX la scritta **MAX** al suo posto); a destra, in linea, **Liv 4 · Riuscita 6 · Costo 15 · Lancio 3** (etichetta accanto al numero, centrata in verticale). Dado al passaggio del mouse. Su telefono i numeri vanno sotto il nome.
-- Clic sul livello per cambiarlo (la riuscita solo per il Master), sui punti per aggiungere/togliere; nel dettaglio (freccia a destra): descrizione, acquisizione, MAX, domanda al Master, modifica completa, elimina.
-- **Riuscita**: mostrata completa, come sul foglio (dado + caratteristica + modificatore + livello, es. 43). La modifica **solo il Master**: scrive la riuscita e si salva il dado (per il giocatore è in sola lettura).
+- Ogni potere è una **riga** (stessa gerarchia delle capacità): nome intero in evidenza (badge "Speciale" / "Vortex"); sotto, la linea dell'avanzamento (al MAX la scritta **MAX** al suo posto); a destra **tre blocchi** in riquadri, sempre a vista:
+  ```
+  Fulmine Sacro     ╭─────────────╮╭────────────╮╭──────────────────────╮
+  ▬▬▬──── 7 / 100   │ LIV RIUSCITA││COSTO LANCIO││RAGGIO  AREA   DURATA │
+                    │  4     43   ││ 15     3   ││  9m     3m    1 min  │
+                    ╰─────────────╯╰────────────╯╰──────────────────────╯
+  ```
+  - **Tiro** (Liv, Riuscita): evidenziato, sfondo d'accento, livello grande.
+  - **Lancio** (Costo, Lancio) ed **Effetto** (Raggio, Area, Durata): tenui, valori più piccoli. Valore vuoto = "—" tenue; raggio e area uguali = un solo valore **Raggio/Area** su due colonne.
+  - Etichetta piccola sopra (11px, niente icone), valore sotto, centrati; colonne a larghezza fissa, incolonnate tra le righe; testi lunghi coi puntini (intero nel tooltip).
+  - Come nelle capacità, il **dado sta a sinistra del Tiro**, 18px, tenue, al passaggio del mouse. Se il pannello è stretto (< 820px) i blocchi vanno sotto il nome, a capo se serve, e il dado sparisce.
+- Clic sul livello per cambiarlo, sui punti per aggiungere/togliere; nel dettaglio (freccia a destra): descrizione, acquisizione, MAX, domanda al Master, modifica completa, elimina.
+- **Riuscita**: il totale fissato (es. 43), in sola lettura nella riga. Il Master la fissa dalla **modifica del potere**: sceglie il **Dado riuscita** e accanto vede la **Riuscita** che ne risulta; al salvataggio si salva quel totale. A livello 0 il dado è bloccato a 20.
 - **Lancio Rapido**: interruttore nella barra in alto (solo se il personaggio ha la capacità); acceso, costo e tempo mostrati sono quelli modificati.
-- Per le classi a mana: **costo di lancio calcolato** dalla tabella se non è scritto.
+- Classi con Punti Mana: sotto **Costo** c'è direttamente il **costo della tabella A108**. Le altre (es. Sacerdoti) vedono il costo scritto, anche "ND". Nessuna etichetta "da tabella".
 
 ### 3b. Allenamenti
 - Punti al giorno per discipline mentali e fisiche (base, capacità di supporto, booster).
@@ -128,24 +138,26 @@ Un solo inventario con due categorie: **Oggetti utilizzabili** ed **Equipaggiame
 │ Ruba tempo                      ✕ │
 │ ┌──────┐┌──────┐┌───────┐┌───────┐│
 │ │INTELL││ MOD. ││LIVELLO││RIUSC. ││
-│ │  20  ││  +3  ││   4   ││   6   ││
+│ │  23  ││  +4  ││   1   ││  31   ││
 │ └──────┘└──────┘└───────┘└───────┘│
 │   ╱‾‾‾╲            TOTALE         │
-│  │  7  │  →         24            │
+│  │  1  │            29   (rosso)  │
 │   ╲___╱                           │
-│            Fallimento             │
-│     [ Ritira il fallimento! ]     │
-│  Dado fisico [__]   [ ] Nascosto  │
+│   ╱‾‾‾╲            LIMITE         │
+│  │  2  │             2   (verde)  │
+│   ╲___╱                           │
+│           ⟳ Nuovo tiro            │
 └───────────────────────────────────┘
 ```
-- Con il tocco sulla scheda il tiro parte **subito**: il d20 "rotola" al centro e si ferma sul risultato (il 20 naturale brilla), resta **fermo al centro per 0,5 secondi**, poi **scivola a sinistra** rimpicciolendosi e a destra compare il **totale**, grande, che sale dal valore del dado fino al risultato. Dado e totale si colorano di verde (Successo) o rosso (Fallimento).
+- Con il tocco sulla scheda il tiro parte **subito**: il d20 "rotola" al centro e si ferma sul risultato (il 20 naturale brilla), resta **fermo al centro per 0,5 secondi**, poi **scivola a sinistra** rimpicciolendosi e a destra compare il **totale**, grande, che sale dal valore del dado fino al risultato.
+- **Nessuna scritta Successo / Fallimento.** Poteri: l'esito si legge dal totale contro la riuscita, e dado e totale si colorano di verde o rosso. Caratteristiche e capacità: colore neutro, nessun esito (le classi difficoltà le sa il Master).
 - Il totale è la somma di d20, caratteristica, modificatore e livello (doc 01 §7), ma la somma **non si scrive**: si vedono i riquadri di riferimento e il totale. Per le caratteristiche il riquadro Livello non c'è.
-- Poteri con il ritiro: il primo dado resta fermo con il suo totale; sotto, "Ritiro N" (d20 naturale).
+- **Ritiro (poteri)**: se il primo dado fallisce (rosso) compare **Ritira il fallimento!** (con dado fisico). Al ritiro si tira **davvero un secondo d20 sotto al primo**: il secondo entra crescendo e il primo **sale per fargli spazio**. A destra del secondo c'è il **Limite** (2 × livello; al MAX 19): verde se il ritiro è entro il limite, rosso altrimenti.
 - Dalla pressione lunga o da "Nuovo tiro" si parte invece dalle opzioni: **Tira il d20**, dado fisico, tiro nascosto.
-- Per i poteri l'esito è automatico (totale contro riuscita completa, poi ritiro); per caratteristiche e capacità si segna a mano (Successo / Fallimento).
+- Storico dei tiri: l'esito compare solo per i poteri (automatico); niente menu per segnarlo a mano.
 
 ### Tiro libero
-Dal dado flottante (o dalla linguetta Tiri): **qualsiasi dado classico** — d4, d6, d8, d10, d12, d20, d100 e Sopra o Sotto — anche più d'uno (− 3 + → **Tira 3d6**: totale grande, dadi singoli sotto). Non è legato alla scheda: **niente caratteristica, niente dado fisico, niente esito**; resta solo "Nascosto".
+Dal dado flottante (o dalla linguetta Tiri): **qualsiasi dado classico** — d4, d6, d8, d10, d12, d20, d100 — anche più d'uno (− 3 + → **Tira 3d6**: si tirano **davvero 3 dadi**, piccoli e in fila, che rotolano e si fermano uno dopo l'altro; fermi tutti, sotto compare il **totale** grande, che sale fino alla somma). Non è legato alla scheda: **niente caratteristica, niente dado fisico, niente esito**; resta solo "Nascosto".
 
 Ogni tiro va nel registro della campagna, visibile al gruppo secondo le regole del doc 02.
 

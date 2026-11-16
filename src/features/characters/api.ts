@@ -346,6 +346,7 @@ export type PowerFields = Pick<
   | 'description'
   /** Solo il Master (lo impone un trigger nel database). */
   | 'success_die'
+  | 'success_target'
 >
 
 export function useUpdatePower(characterId: string) {

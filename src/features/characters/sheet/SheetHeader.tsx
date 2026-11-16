@@ -47,6 +47,7 @@ const RESOURCE_COLORS: Record<string, string> = {
   anima: 'var(--c-soul)',
 }
 
+
 /**
  * Intestazione fissa della scheda (la pagina non scorre).
  * Desktop: targhetta con tutti i dati e parametri vitali su una fila.

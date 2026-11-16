@@ -4,9 +4,8 @@ import {
   attributeModifier,
   DIE_LABELS,
   FREE_DICE,
-  coinLabel,
   dieSides,
-  powerSuccessTarget,
+  rerollSafeThreshold,
   resolvePowerRoll,
   rollBonus,
   rollDie,
@@ -15,7 +14,7 @@ import {
 } from '../../game/rules'
 import { AddIcon, DiceIcon, HiddenIcon, MinusIcon, RerollIcon } from '../../components/icons'
 import { attributeValues, type CharacterSheet } from '../characters/api'
-import { OUTCOME_LABELS, useSaveRoll, useSetRollOutcome, type RollOutcome } from './api'
+import { useSaveRoll, type RollOutcome } from './api'
 import styles from './DiceRoller.module.less'
 
 /** Cosa si sta tirando: caratteristica, capacità o potere. Si tira sempre il d20. */
@@ -27,18 +26,20 @@ export interface RollTarget {
   isMaxed?: boolean
   /** Prova di sola caratteristica: il livello non c'è (e non si somma). */
   attributeOnly?: boolean
-  /** Solo poteri/miracoli: hanno il dado riuscita e il "ritirare il fallimento". */
-  power?: { successDie: number | null }
+  /** Solo poteri/miracoli: riuscita fissata dal Master e "ritirare il fallimento". */
+  power?: { successTarget: number | null }
 }
 
 type Phase =
   | { step: 'ready' }
-  | { step: 'reroll'; first: number }
-  | { step: 'done'; rollId: string; results: number[]; state: PowerRollState | null; outcome: RollOutcome | null }
+  | { step: 'reroll'; n: number; first: number }
+  | { step: 'done'; n: number; results: number[]; state: PowerRollState | null }
+
+type Tone = 'success' | 'failure' | 'neutral'
 
 /**
  * Tiro d20 con i dati di riferimento (caratteristica, modificatore, livello) a vista.
- * Per i poteri l'esito è automatico: dado riuscita del Master e, se fallisce, ritiro.
+ * Nessun esito scritto: per i poteri parlano i colori (totale contro riuscita fissata, poi ritiro).
  */
 export function DiceRoller({
   sheet,
@@ -51,22 +52,22 @@ export function DiceRoller({
   autoRoll?: boolean
 }) {
   const save = useSaveRoll()
-  const setOutcome = useSetRollOutcome()
   const attributes = attributeValues(sheet)
 
   const [hidden, setHidden] = useState(false)
   const [physical, setPhysical] = useState('')
   const [phase, setPhase] = useState<Phase>({ step: 'ready' })
+  const rolls = useRef(0)
 
   const attribute = target.attribute
   const level = target.level
   const isMaxed = target.isMaxed ?? false
-  const successDie = target.power?.successDie ?? null
-  const automatic = successDie !== null
+  const successTarget = target.power?.successTarget ?? null
   const attributeValue = attribute ? attributes[attribute] : null
   const label = target.label
   // Totale = d20 + caratteristica + modificatore + livello (docs/01 §7)
   const bonus = rollBonus(attributeValue, level)
+  const power = successTarget === null ? null : { target: successTarget, level, isMaxed, bonus }
 
   const physicalInvalid = physical.trim() !== '' && parsePhysical(physical) === null
 
@@ -74,9 +75,9 @@ export function DiceRoller({
     return physical.trim() === '' ? rollDie('d20') : parsePhysical(physical)
   }
 
-  async function persist(results: number[], state: PowerRollState | null) {
+  function persist(results: number[], state: PowerRollState | null) {
     const outcome: RollOutcome | null = state === null ? null : state === 'failed' ? 'failure' : 'success'
-    const rollId = await save.mutateAsync({
+    save.mutate({
       campaignId: sheet.campaign_id,
       characterId: sheet.id,
       label,
@@ -94,27 +95,41 @@ export function DiceRoller({
         bonus,
         is_maxed: isMaxed,
         power: !!target.power,
-        success_die: successDie,
+        success_target: successTarget,
         state,
         auto_outcome: state !== null,
         physical: physical.trim() !== '',
       },
     })
     setPhysical('')
-    setPhase({ step: 'done', rollId, results, state, outcome })
   }
 
-  async function onRoll() {
+  function onRoll() {
     const value = readValue()
     if (value === null) return
-    if (successDie === null) return persist([value], null)
-    const state = resolvePowerRoll({ successDie, level, isMaxed, bonus }, value)
+    rolls.current += 1
+    const n = rolls.current
+    if (power === null) {
+      setPhase({ step: 'done', n, results: [value], state: null })
+      return persist([value], null)
+    }
+    const state = resolvePowerRoll(power, value)
     if (state === 'pending') {
+      // Si salva solo a ritiro fatto, con entrambi i dadi
       setPhysical('')
-      setPhase({ step: 'reroll', first: value })
+      setPhase({ step: 'reroll', n, first: value })
       return
     }
-    await persist([value], state)
+    setPhase({ step: 'done', n, results: [value], state })
+    persist([value], state)
+  }
+
+  function onReroll(first: number, n: number) {
+    const value = readValue()
+    if (value === null || power === null) return
+    const state = resolvePowerRoll(power, first, value)
+    setPhase({ step: 'done', n, results: [first, value], state })
+    persist([first, value], state)
   }
 
   // Tiro immediato: una sola volta, anche con lo StrictMode.
@@ -122,18 +137,19 @@ export function DiceRoller({
   useEffect(() => {
     if (!autoRoll || autoRolled.current) return
     autoRolled.current = true
-    void onRoll()
+    onRoll()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoRoll])
 
-  async function onReroll(first: number) {
-    const value = readValue()
-    if (value === null || successDie === null) return
-    await persist([first, value], resolvePowerRoll({ successDie, level, isMaxed, bonus }, first, value))
-  }
-
   // Durante il tiro automatico non si mostra il pulsante "Tira" per un attimo.
-  const waitingAuto = autoRoll && phase.step === 'ready' && (save.isPending || !autoRolled.current)
+  const waitingAuto = autoRoll && phase.step === 'ready' && !autoRolled.current
+
+  const first = phase.step === 'reroll' ? phase.first : phase.step === 'done' ? phase.results[0] : undefined
+  const second = phase.step === 'done' ? phase.results[1] : undefined
+  const state = phase.step === 'done' ? phase.state : null
+  // Il primo dado è rosso se ha chiesto il ritiro; il secondo dice l'esito vero
+  const firstTone: Tone = power === null ? 'neutral' : phase.step === 'reroll' || second !== undefined || state === 'failed' ? 'failure' : 'success'
+  const secondTone: Tone = state === 'saved' ? 'success' : 'failure'
 
   return (
     <div className={styles.roller}>
@@ -141,67 +157,77 @@ export function DiceRoller({
         {attribute && <Fact label={ATTRIBUTES[attribute].label} value={attributeValue ?? '—'} />}
         {attributeValue !== null && <Fact label="Mod." value={`+${attributeModifier(attributeValue)}`} />}
         {!target.attributeOnly && <Fact label="Livello" value={level ?? 'NA'} extra={isMaxed ? 'MAX' : undefined} />}
-        {target.power && <Fact label="Riuscita" value={successDie === null ? '—' : powerSuccessTarget(successDie, bonus)} />}
+        {target.power && <Fact label="Riuscita" value={successTarget ?? '—'} />}
       </dl>
 
-      {phase.step === 'done' ? (
-        <RollResult
-          phase={phase}
-          bonus={bonus}
-          automatic={automatic}
-          pending={setOutcome.isPending}
-          onOutcome={(outcome) => {
-            setOutcome.mutate({ id: phase.rollId, outcome })
-            setPhase({ ...phase, outcome })
-          }}
-          onAgain={() => setPhase({ step: 'ready' })}
-        />
-      ) : waitingAuto ? (
+      {waitingAuto ? (
         <div className={styles.result}>
           <D20 value={0} tone="neutral" spinning />
         </div>
       ) : (
-        <>
-          {phase.step === 'reroll' && (
-            <div className={styles.result}>
-              <RollStage value={phase.first} total={phase.first + bonus} tone="failure" />
-              <strong className={styles.failed}>Fallimento</strong>
-            </div>
-          )}
-
-          <button
-            type="button"
-            className={`btn btn--primary ${styles.rollButton}`}
-            disabled={save.isPending || physicalInvalid}
-            onClick={() => (phase.step === 'reroll' ? onReroll(phase.first) : onRoll())}
-          >
-            {phase.step === 'reroll' ? <RerollIcon aria-hidden /> : <DiceIcon aria-hidden />}
-            {phase.step === 'reroll' ? 'Ritira il fallimento!' : physical.trim() ? 'Registra' : 'Tira il d20'}
-          </button>
-
-          <div className={styles.options}>
-            <label className={styles.inline}>
-              Dado fisico
-              <input
-                className={`input ${styles.physical}`}
-                type="number"
-                min={1}
-                max={20}
-                value={physical}
-                onChange={(e) => setPhysical(e.target.value)}
-                placeholder="1–20"
-                aria-label="Risultato del dado fisico"
-                aria-invalid={physicalInvalid}
-              />
-            </label>
-            {phase.step === 'ready' && (
-              <label className={styles.inline}>
-                <input type="checkbox" checked={hidden} onChange={(e) => setHidden(e.target.checked)} />
-                <HiddenIcon aria-hidden /> Nascosto
-              </label>
+        first !== undefined &&
+        phase.step !== 'ready' && (
+          <div className={styles.result} aria-live="polite">
+            {/* Stessa chiave tra "ritiro" e "fatto": il primo dado non ritira, sale per fare spazio */}
+            <RollStage key={`first-${phase.n}`} value={first} total={first + bonus} tone={firstTone} />
+            {second !== undefined && (
+              <div className={styles.secondStage}>
+                <div>
+                  <RollStage
+                    key={`second-${phase.n}`}
+                    value={second}
+                    total={rerollSafeThreshold(level, isMaxed)}
+                    totalLabel="Limite"
+                    tone={secondTone}
+                  />
+                </div>
+              </div>
             )}
           </div>
-        </>
+        )
+      )}
+
+      {phase.step === 'done' ? (
+        <button type="button" className={`btn btn--ghost ${styles.againButton}`} onClick={() => setPhase({ step: 'ready' })}>
+          <DiceIcon aria-hidden /> Nuovo tiro
+        </button>
+      ) : (
+        !waitingAuto && (
+          <>
+            <button
+              type="button"
+              className={`btn btn--primary ${styles.rollButton}`}
+              disabled={physicalInvalid}
+              onClick={() => (phase.step === 'reroll' ? onReroll(phase.first, phase.n) : onRoll())}
+            >
+              {phase.step === 'reroll' ? <RerollIcon aria-hidden /> : <DiceIcon aria-hidden />}
+              {phase.step === 'reroll' ? 'Ritira il fallimento!' : physical.trim() ? 'Registra' : 'Tira il d20'}
+            </button>
+
+            <div className={styles.options}>
+              <label className={styles.inline}>
+                Dado fisico
+                <input
+                  className={`input ${styles.physical}`}
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={physical}
+                  onChange={(e) => setPhysical(e.target.value)}
+                  placeholder="1–20"
+                  aria-label="Risultato del dado fisico"
+                  aria-invalid={physicalInvalid}
+                />
+              </label>
+              {phase.step === 'ready' && (
+                <label className={styles.inline}>
+                  <input type="checkbox" checked={hidden} onChange={(e) => setHidden(e.target.checked)} />
+                  <HiddenIcon aria-hidden /> Nascosto
+                </label>
+              )}
+            </div>
+          </>
+        )
       )}
 
       {save.error && <p className="error-box">{save.error.message}</p>}
@@ -215,19 +241,22 @@ function D20({
   tone,
   spinning = false,
   sides = 20,
-  text,
   animate = true,
+  rollTicks = 10,
+  small = false,
   onSettled,
 }: {
   value: number
-  tone: 'success' | 'failure' | 'neutral'
+  tone: Tone
   spinning?: boolean
   /** Valori che "rotolano" durante l'animazione (1…sides). */
   sides?: number
-  /** Testo al posto del numero (es. Sopra / Sotto). */
-  text?: string
   /** false = già fermo sul risultato, senza rotolare. */
   animate?: boolean
+  /** Quanti scatti prima di fermarsi (più dadi: si fermano uno dopo l'altro). */
+  rollTicks?: number
+  /** Dado piccolo, per i tiri di più dadi. */
+  small?: boolean
   /** Chiamata quando il dado si ferma. */
   onSettled?: () => void
 }) {
@@ -247,7 +276,7 @@ function D20({
     let ticks = 0
     const timer = window.setInterval(() => {
       ticks += 1
-      if (!spinning && ticks >= 10) {
+      if (!spinning && ticks >= rollTicks) {
         window.clearInterval(timer)
         setShown(value)
         setRolling(false)
@@ -257,7 +286,7 @@ function D20({
       }
     }, 45)
     return () => window.clearInterval(timer)
-  }, [value, spinning, sides, animate])
+  }, [value, spinning, sides, animate, rollTicks])
 
   const toneClass = rolling
     ? styles.dieRolling
@@ -269,13 +298,13 @@ function D20({
   const special = rolling || sides !== 20 ? '' : value === 20 ? styles.crit : value === 1 ? styles.fumble : ''
 
   return (
-    <div className={`${styles.die} ${toneClass} ${special}`} role="img" aria-label={rolling ? 'Tiro in corso' : `Risultato ${value}`}>
+    <div className={`${styles.die} ${small ? styles.dieSmall : ''} ${toneClass} ${special}`} role="img" aria-label={rolling ? 'Tiro in corso' : `Risultato ${value}`}>
       <svg viewBox="0 0 100 100" aria-hidden className={styles.dieShape}>
         <polygon points="50,3 93,27 93,73 50,97 7,73 7,27" />
         <polygon points="50,22 76,66 24,66" className={styles.dieFacet} />
         <path d="M50 3 L50 22 M93 27 L76 66 M7 27 L24 66 M93 73 L76 66 M7 73 L24 66 M50 97 L50 66" className={styles.dieEdge} />
       </svg>
-      <span className={`${styles.dieValue} ${!rolling && text ? styles.dieText : ''}`}>{!rolling && text ? text : shown}</span>
+      <span className={styles.dieValue}>{shown}</span>
     </div>
   )
 }
@@ -297,12 +326,6 @@ function parsePhysical(text: string): number | null {
   return n >= 1 && n <= 20 ? n : null
 }
 
-const STATE_TEXT: Record<Exclude<PowerRollState, 'pending'>, string> = {
-  success: 'Successo',
-  saved: 'Successo',
-  failed: 'Fallimento',
-}
-
 /** Quanto resta visibile al centro il dado fermo, prima di spostarsi. */
 const DIE_PAUSE_MS = 500
 
@@ -314,12 +337,13 @@ function RollStage({
   value,
   total,
   tone,
-  animate = true,
+  totalLabel = 'Totale',
 }: {
   value: number
   total: number
-  tone: 'success' | 'failure' | 'neutral'
-  animate?: boolean
+  tone: Tone
+  /** Etichetta del numero a destra (il ritiro mostra il limite, 2 × livello). */
+  totalLabel?: string
 }) {
   const [landed, setLanded] = useState(false)
   const [settled, setSettled] = useState(false)
@@ -327,20 +351,21 @@ function RollStage({
   // Il dado fermo resta al centro per un attimo, poi scivola a sinistra
   useEffect(() => {
     if (!landed) return
-    const timer = window.setTimeout(() => setSettled(true), animate ? DIE_PAUSE_MS : 0)
+    const timer = window.setTimeout(() => setSettled(true), DIE_PAUSE_MS)
     return () => window.clearTimeout(timer)
-  }, [landed, animate])
+  }, [landed])
 
   const toneClass = tone === 'success' ? styles.totalSuccess : tone === 'failure' ? styles.totalFailure : ''
+  const isTotal = totalLabel === 'Totale'
 
   return (
     <div className={`${styles.stage} ${settled ? styles.stageSettled : ''}`}>
       <div className={styles.stageDie}>
-        <D20 value={value} tone={tone} animate={animate} onSettled={() => setLanded(true)} />
+        <D20 value={value} tone={tone} onSettled={() => setLanded(true)} />
       </div>
       <div className={`${styles.total} ${toneClass}`} aria-hidden={!settled}>
-        <small>Totale</small>
-        <CountUp from={animate ? value : total} to={total} run={settled} />
+        <small>{totalLabel}</small>
+        <CountUp from={isTotal ? value : total} to={total} run={settled} />
       </div>
     </div>
   )
@@ -370,66 +395,34 @@ function CountUp({ from, to, run }: { from: number; to: number; run: boolean }) 
   return <b>{n}</b>
 }
 
-function RollResult({
-  phase,
-  bonus,
-  automatic,
-  pending,
-  onOutcome,
-  onAgain,
-}: {
-  phase: Extract<Phase, { step: 'done' }>
-  bonus: number
-  automatic: boolean
-  pending: boolean
-  onOutcome: (outcome: RollOutcome | null) => void
-  onAgain: () => void
-}) {
-  const [first, second] = phase.results
-  const state = phase.state === 'pending' ? null : phase.state
-  const tone =
-    automatic && state
-      ? state === 'failed'
-        ? 'failure'
-        : 'success'
-      : phase.outcome === 'failure'
-        ? 'failure'
-        : phase.outcome === 'success'
-          ? 'success'
-          : 'neutral'
+/**
+ * Più dadi: si tirano davvero tutti, ognuno rotola e si ferma uno dopo l'altro;
+ * quando sono fermi tutti compare il totale, che sale fino alla somma.
+ */
+function MultiRoll({ results, sides }: { results: number[]; sides: number }) {
+  const [settled, setSettled] = useState(0)
+  const done = settled >= results.length
+  const total = results.reduce((a, b) => a + b, 0)
 
   return (
-    <div className={styles.result}>
-      {/* Con il ritiro il primo dado è già stato visto: si ripropone fermo */}
-      <RollStage value={first ?? 0} total={(first ?? 0) + bonus} tone={tone} animate={second === undefined} />
-      {second !== undefined && (
-        <p className={styles.resultDetail}>
-          <RerollIcon aria-hidden /> Ritiro {second}
-        </p>
-      )}
-
-      {automatic && state ? (
-        <p className={state === 'failed' ? styles.failed : styles.succeeded}>{STATE_TEXT[state]}</p>
-      ) : (
-        <div className={styles.outcomes} role="group" aria-label="Esito">
-          {(['success', 'failure'] as const).map((o) => (
-            <button
-              key={o}
-              type="button"
-              className={`btn ${phase.outcome === o ? (o === 'success' ? styles.pickedSuccess : styles.pickedFailure) : ''}`}
-              aria-pressed={phase.outcome === o}
-              disabled={pending}
-              onClick={() => onOutcome(phase.outcome === o ? null : o)}
-            >
-              {OUTCOME_LABELS[o]}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <button type="button" className="btn btn--ghost" onClick={onAgain}>
-        <DiceIcon aria-hidden /> Nuovo tiro
-      </button>
+    <div className={styles.multi}>
+      <div className={styles.multiDice}>
+        {results.map((value, i) => (
+          <D20
+            key={i}
+            value={value}
+            tone="neutral"
+            sides={sides}
+            small
+            rollTicks={8 + i * 2}
+            onSettled={() => setSettled((n) => n + 1)}
+          />
+        ))}
+      </div>
+      <div className={`${styles.multiTotal} ${done ? styles.multiTotalShown : ''}`} aria-hidden={!done}>
+        <small>Totale</small>
+        <CountUp from={0} to={total} run={done} />
+      </div>
     </div>
   )
 }
@@ -447,12 +440,10 @@ export function FreeRoller({ sheet }: { sheet: CharacterSheet }) {
   const [hidden, setHidden] = useState(false)
   const [last, setLast] = useState<{ die: DieKind; results: number[]; n: number } | null>(null)
 
-  const isCoin = die === 'coin'
-  const dice = isCoin ? 1 : count
-  const name = isCoin ? DIE_LABELS.coin : `${dice > 1 ? dice : ''}${DIE_LABELS[die]}`
+  const name = `${count > 1 ? count : ''}${DIE_LABELS[die]}`
 
   function roll() {
-    const results = Array.from({ length: dice }, () => rollDie(die))
+    const results = Array.from({ length: count }, () => rollDie(die))
     setLast((l) => ({ die, results, n: (l?.n ?? 0) + 1 }))
     save.mutate({
       campaignId: sheet.campaign_id,
@@ -460,14 +451,12 @@ export function FreeRoller({ sheet }: { sheet: CharacterSheet }) {
       label: name,
       die,
       results,
-      total: isCoin ? null : results.reduce((a, b) => a + b, 0),
+      total: results.reduce((a, b) => a + b, 0),
       outcome: null,
       hidden,
       details: {},
     })
   }
-
-  const total = last ? last.results.reduce((a, b) => a + b, 0) : 0
 
   return (
     <div className={styles.roller}>
@@ -487,29 +476,24 @@ export function FreeRoller({ sheet }: { sheet: CharacterSheet }) {
 
       {last && (
         <div className={styles.result} aria-live="polite">
-          <D20
-            key={last.n}
-            value={total}
-            tone="neutral"
-            sides={dieSides(last.die) * last.results.length}
-            text={last.die === 'coin' ? coinLabel(last.results[0] ?? 1) : undefined}
-          />
-          {last.results.length > 1 && <p className={styles.resultDetail}>{last.results.join(' + ')}</p>}
+          {last.results.length === 1 ? (
+            <D20 key={last.n} value={last.results[0]!} tone="neutral" sides={dieSides(last.die)} />
+          ) : (
+            <MultiRoll key={last.n} results={last.results} sides={dieSides(last.die)} />
+          )}
         </div>
       )}
 
       <div className={styles.freeActions}>
-        {!isCoin && (
-          <span className={styles.count} role="group" aria-label="Quanti dadi">
-            <button type="button" aria-label="Un dado in meno" disabled={count <= 1} onClick={() => setCount((c) => c - 1)}>
-              <MinusIcon aria-hidden />
-            </button>
-            <b>{count}</b>
-            <button type="button" aria-label="Un dado in più" disabled={count >= 20} onClick={() => setCount((c) => c + 1)}>
-              <AddIcon aria-hidden />
-            </button>
-          </span>
-        )}
+        <span className={styles.count} role="group" aria-label="Quanti dadi">
+          <button type="button" aria-label="Un dado in meno" disabled={count <= 1} onClick={() => setCount((c) => c - 1)}>
+            <MinusIcon aria-hidden />
+          </button>
+          <b>{count}</b>
+          <button type="button" aria-label="Un dado in più" disabled={count >= 20} onClick={() => setCount((c) => c + 1)}>
+            <AddIcon aria-hidden />
+          </button>
+        </span>
         <button type="button" className={`btn btn--primary ${styles.rollButton}`} onClick={roll}>
           <DiceIcon aria-hidden /> Tira {name}
         </button>

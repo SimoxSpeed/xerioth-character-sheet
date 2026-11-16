@@ -56,4 +56,4 @@ Sostituire le schede personaggio su Google Sheets del gioco di ruolo **Xerioth**
 
 1. ⏳ Elenco delle **classi** (risorsa e caratteristica di lancio): arriverà più avanti. Intanto ci sono template provvisori.
 
-Risolte nella 2ª revisione: esperienza (tabella A38, costo per arrivare al livello), costo di lancio (tabella A108, vale anche per lo Spirito), armi e armature nell'equipaggiamento, tiri (il gruppo vede totale ed esito).
+Risolte nella 2ª revisione: esperienza (tabella A38, costo per arrivare al livello), costo di lancio (tabella A108, solo per chi ha Punti Mana), armi e armature nell'equipaggiamento, tiri (il gruppo vede totale ed esito).

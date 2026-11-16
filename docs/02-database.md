@@ -190,7 +190,8 @@ Un trigger impedisce a chiunque di cambiare il proprio ruolo dall'app.
 | `range`, `area`, `cast_time`, `cost`, `duration` | text | "Personale", "8", "70", "30 minuti" |
 | `advancement` | int | 119 |
 | `is_special` | bool | potere speciale (etichetta) |
-| `success_die` | int 0–20 nullable | dado riuscita: lo fissa **solo il Master** (trigger `guard_power_success_die`); null = da fissare |
+| `success_die` | int 0–20 nullable | dado riuscita scelto dal Master; a livello 0 solo 20. Lo cambia **solo il Master** (trigger `guard_power_success_die`); null = da fissare |
+| `success_target` | int nullable | riuscita fissa: dado + caratteristica + modificatore + livello al momento della scelta del dado. Il tiro riesce se totale ≥ valore. Solo il Master (stesso trigger) |
 | `granted_by` | text nullable | "Vortex", "Eridani" |
 | `description` | text | |
 | `sort_order` | int | |
@@ -273,7 +274,7 @@ Il gruppo vede di ogni tiro **solo il totale e l'esito** (successo / fallimento 
 - **`dice_rolls`**: il tiro completo (nome della prova, dadi, scomposizione). Lo vedono **solo chi tira e il Master**.
 - **`dice_roll_feed`**: la versione pubblica (personaggio, totale, esito, data), compilata in automatico da un trigger. La vede **tutto il gruppo**, in tempo reale. I tiri "nascosti" non ci finiscono.
 
-L'esito si calcola se si conosce la difficoltà; altrimenti lo segna il giocatore dopo il tiro. Il critico negativo è automatico.
+L'esito c'è solo per i poteri e si calcola da solo (totale contro `success_target`, poi ritiro). Caratteristiche e capacità non hanno esito: le classi difficoltà le conosce solo il Master.
 
 **`dice_rolls`**
 | Colonna | Tipo | Note |

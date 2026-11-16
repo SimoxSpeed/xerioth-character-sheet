@@ -134,7 +134,7 @@ Verifica (esempio del foglio): 21 + 3² + 11×3 + T(28)=296 + 8² = **423**. ✅
 
 Fonte: *Avanzamenti › A108 (Punti mana che servono per lanciare incantesimi)*. Tabella a doppia entrata: **Bonus** = livello attuale dell'incantesimo (0–10) × **Livello** = livello di acquisizione (1–10). Esempio: acquisizione 3, livello attuale 2 → **25**.
 
-Vale per **incantesimi e miracoli**: i Punti Spirito si comportano come il Mana (risposta alla revisione).
+Vale **solo per chi ha Punti Mana** (dipende dalla classe; elenco completo in arrivo): sotto **Costo** si vede direttamente il valore della tabella, senza etichette. I Sacerdoti (Punti Spirito) non la usano: il costo è quello scritto, anche "ND".
 
 Nell'app il costo **calcolato dalla tabella** compare accanto a ogni potere con livello di acquisizione noto. Il campo "costo" scritto a mano resta e **ha la precedenza**, perché alcuni costi attuali sono diversi (es. Omnia, Ruba tempo: 70).
 
@@ -230,7 +230,7 @@ Quando si verificano le condizioni, l'app avvisa: *"Puoi segnare X a livello 1"*
 
 ## 7. Tiri di dado
 
-**I tiri della scheda si fanno con il d20.** Gli altri dadi (d4, d6, d8, d10, d12, d100, "Sopra o Sotto") si tirano nel **tiro libero**, senza legarli a niente della scheda. Il risultato del d20 si può **tirare nell'app** o **inserire da un dado fisico**.
+**I tiri della scheda si fanno con il d20.** Gli altri dadi (d4, d6, d8, d10, d12, d100) si tirano nel **tiro libero**, senza legarli a niente della scheda. Il risultato del d20 si può **tirare nell'app** o **inserire da un dado fisico**.
 
 ### Totale
 
@@ -243,15 +243,16 @@ Es. Spada (Abilità 15, mod +1, liv. 1) con d20 = 7 → totale **24**. L'app mos
 
 ### Caratteristiche e capacità
 
-Non hanno un dado riuscita: dopo il tiro l'esito (successo / fallimento) lo segna il giocatore, come deciso dal Master.
+Non hanno un dado riuscita e **non hanno esito**: le classi difficoltà le conosce solo il Master. Si vede solo il totale.
 
-### Poteri e miracoli: dado riuscita
+### Poteri e miracoli: riuscita fissata dal Master
 
-- Ogni potere ha un **dado riuscita** (`success_die`) che **fissa il Master** dopo le sue elaborazioni; poi resta fisso. Il giocatore non può cambiarlo (lo impedisce il database).
-- **Riuscita** = dado riuscita + caratteristica + modificatore + livello (foglio "Dadi riuscita"; es. Corrosione: 20 + Intelligenza 20 + 3 + liv. 0 = **43**). Si calcola con i valori attuali; il Master fissa solo il dado.
-- Il potere **riesce se il totale del tiro è uguale o maggiore della riuscita** (dado 0 = riesce sempre). In pratica equivale a d20 ≥ dado, ma si leggono totale e riuscita.
-- Finché il Master non l'ha fissato, l'esito si segna a mano.
-- Valori di Omnia importati dal foglio "Miracoli per Master" (colonna Dado Riuscita).
+- Quando conferisce il potere, il **Master sceglie il dado riuscita** (`success_die`, 0–20) e vede subito la **riuscita** che il personaggio dovrà fare: dado + caratteristica + modificatore + livello **di quel momento** (foglio "Dadi riuscita"; es. Corrosione: 20 + Intelligenza 20 + 3 + liv. 0 = **43**).
+- Nel database si salva **il totale** (`success_target`), che poi **resta fisso**: alzando dopo caratteristica o livello il potere riesce più facilmente (es. Corrosione 43 con Intelligenza 23: basta un 16 invece di un 20). Si ricalcola solo se il Master cambia il dado.
+- **Regola fissa: un potere a livello 0 parte solo con dado 20** (l'app lo imposta da sola, il database rifiuta altri dadi).
+- Il giocatore non può cambiare dado né riuscita (lo impedisce il database).
+- Il potere **riesce se il totale del tiro è uguale o maggiore della riuscita**. Finché il Master non l'ha fissata, non c'è esito.
+- Riuscite di Omnia prese dal foglio "Dadi riuscita" (colonna Riuscita, calcolate con Intelligenza 20).
 
 ### Ritirare il fallimento (solo poteri e miracoli)
 

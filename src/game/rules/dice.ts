@@ -1,6 +1,7 @@
 // Tiri di dado (docs/01-regole-di-gioco.md §7)
 import { attributeModifier } from './attributes'
 
+/** 'coin' (Sopra o Sotto) non si tira più: resta per i tiri già nello storico. */
 export type DieKind = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100' | 'coin'
 
 /** Facce di ogni dado (la moneta vale 1 = Sopra, 2 = Sotto). */
@@ -18,7 +19,7 @@ export const DIE_LABELS: Record<DieKind, string> = {
 }
 
 /** Dadi del tiro libero, nell'ordine in cui si mostrano. */
-export const FREE_DICE: DieKind[] = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100', 'coin']
+export const FREE_DICE: DieKind[] = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100']
 
 /** Valore massimo di un dado. */
 export function dieSides(die: DieKind): number {
@@ -46,26 +47,28 @@ export function rollBonus(attributeValue: number | null, level: number | null): 
 }
 
 // ---------------------------------------------------------------------------
-// Poteri e miracoli: dado riuscita fissato dal Master
+// Poteri e miracoli: riuscita fissata dal Master
+
+/** Un potere a livello 0 parte solo con dado 20. */
+export const LEVEL_ZERO_SUCCESS_DIE = 20
+
+/** Dado imposto dalla regola (livello 0 → 20); null = lo sceglie il Master. */
+export function forcedSuccessDie(level: number | null): number | null {
+  return level === 0 ? LEVEL_ZERO_SUCCESS_DIE : null
+}
 
 /**
- * Riuscita di un potere (foglio "Dadi riuscita"): dado fissato dal Master
- * + caratteristica + modificatore + livello. Es. Corrosione: 20 + 20 + 3 + 0 = 43.
+ * Riuscita da fissare (foglio "Dadi riuscita"): dado scelto dal Master
+ * + caratteristica + modificatore + livello di quel momento. Es. Corrosione: 20 + 20 + 3 + 0 = 43.
+ * Si salva il totale: alzando dopo caratteristica o livello il potere riesce più facilmente.
  */
 export function powerSuccessTarget(successDie: number, bonus: number): number {
   return successDie + bonus
 }
 
-/** Il potere riesce se il totale del tiro raggiunge la riuscita (dado 0 = riesce sempre). */
-export function meetsSuccessDie(total: number, target: number): boolean {
+/** Il potere riesce se il totale del tiro raggiunge la riuscita. */
+export function meetsSuccessTarget(total: number, target: number): boolean {
   return total >= target
-}
-
-/** "dal 6 in su", "riesce sempre", "solo con 20". */
-export function successDieText(successDie: number): string {
-  if (successDie <= 1) return 'riesce sempre'
-  if (successDie >= 20) return 'solo con 20'
-  return `dal ${successDie} in su`
 }
 
 /** Ritirare il fallimento: si salva con un ritiro ≤ 2 × livello (al massimo: fino a 19). */
@@ -80,16 +83,8 @@ export function isRerollFailure(reroll: number, level: number | null, isMaxed: b
   return reroll > rerollSafeThreshold(level, isMaxed)
 }
 
-/** Spiega il margine del ritiro, es. "Riesce con 1–8, da 9 a 20 fallisce." */
-export function rerollMarginText(level: number | null, isMaxed: boolean): string {
-  const safe = rerollSafeThreshold(level, isMaxed)
-  if (safe <= 0) return 'Nessun margine: il ritiro fallisce comunque.'
-  return `Riesce con 1–${safe}, da ${safe + 1} a 20 fallisce.`
-}
-
 /**
- * - `success`: il totale (d20 + caratteristica + modificatore + livello) raggiunge la riuscita
- *   (dado + caratteristica + modificatore + livello);
+ * - `success`: il totale (d20 + caratteristica + modificatore + livello) raggiunge la riuscita fissata;
  * - `pending`: fallito, serve il ritiro;
  * - `saved`: ritiro (d20 naturale) ≤ 2 × livello, il potere riesce;
  * - `failed`: fallimento vero.
@@ -97,12 +92,11 @@ export function rerollMarginText(level: number | null, isMaxed: boolean): string
 export type PowerRollState = 'success' | 'pending' | 'saved' | 'failed'
 
 export function resolvePowerRoll(
-  power: { successDie: number; level: number | null; isMaxed: boolean; /** Si somma al primo d20. */ bonus?: number },
+  power: { target: number; level: number | null; isMaxed: boolean; /** Si somma al primo d20. */ bonus?: number },
   roll: number,
   reroll?: number,
 ): PowerRollState {
-  const bonus = power.bonus ?? 0
-  if (meetsSuccessDie(roll + bonus, powerSuccessTarget(power.successDie, bonus))) return 'success'
+  if (meetsSuccessTarget(roll + (power.bonus ?? 0), power.target)) return 'success'
   if (reroll === undefined) return 'pending'
   return isRerollFailure(reroll, power.level, power.isMaxed) ? 'failed' : 'saved'
 }

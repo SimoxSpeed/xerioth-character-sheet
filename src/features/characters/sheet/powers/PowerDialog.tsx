@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
-import type { PowerSection } from '../../../../game/rules'
+import { forcedSuccessDie, powerSuccessTarget, rollBonus, type PowerSection } from '../../../../game/rules'
 import { Dialog } from '../../../../components/Dialog'
-import { useAddPower, useUpdatePower, type CharacterSheet, type PowerRow } from '../../api'
+import { attributeValues, useAddPower, useUpdatePower, type CharacterSheet, type PowerRow } from '../../api'
 import styles from './PowerDialog.module.less'
 
 interface Props {
@@ -68,6 +68,16 @@ function PowerForm({
   const pending = add.isPending || update.isPending
   const error = add.error ?? update.error
 
+  // Riuscita: il Master sceglie il dado e si salva il totale di questo momento
+  // (dado + caratteristica + modificatore + livello). Livello 0 = sempre dado 20.
+  const levelValue = toNumber(level)
+  const forcedDie = forcedSuccessDie(levelValue)
+  const chosenDie = forcedDie ?? (successDie.trim() === '' ? null : Math.min(20, toNumber(successDie) ?? 0))
+  const dieChanged = chosenDie !== (power?.success_die ?? null) || (chosenDie !== null && power?.success_target == null)
+  const newTarget =
+    chosenDie === null ? null : powerSuccessTarget(chosenDie, rollBonus(attributeValues(sheet)[section.attribute], levelValue))
+  const shownTarget = dieChanged ? newTarget : (power?.success_target ?? null)
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
     const acquisitionLevel = toNumber(acquisition)
@@ -84,8 +94,9 @@ function PowerForm({
       granted_by: grantedBy.trim() || null,
       is_special: isSpecial,
       description: description.trim(),
-      // Il dado riuscita lo manda solo il Master (il database rifiuta gli altri).
-      ...(isMaster ? { success_die: successDie.trim() === '' ? null : Math.min(20, toNumber(successDie) ?? 0) } : {}),
+      // Dado e riuscita li manda solo il Master (il database rifiuta gli altri), e solo se il dado cambia:
+      // la riuscita già fissata non si ricalcola.
+      ...(isMaster && dieChanged ? { success_die: chosenDie, success_target: newTarget } : {}),
     }
     if (power) await update.mutateAsync({ id: power.id, patch: fields })
     else await add.mutateAsync(fields)
@@ -106,7 +117,7 @@ function PowerForm({
           <span>Livello (vuoto = NA)</span>
           <input className="input" type="number" min={0} value={level} onChange={(e) => setLevel(e.target.value)} />
         </label>
-        <label className="field" title="Livello di acquisizione (1–10): serve per il costo da tabella">
+        <label className="field">
           <span>Acquisizione (1–10)</span>
           <input
             className="input"
@@ -123,7 +134,7 @@ function PowerForm({
             className="input"
             value={cost}
             onChange={(e) => setCost(e.target.value)}
-            placeholder="vuoto = da tabella"
+            placeholder="ND"
           />
         </label>
       </div>
@@ -164,21 +175,29 @@ function PowerForm({
           <input type="checkbox" checked={isSpecial} onChange={(e) => setIsSpecial(e.target.checked)} />
           Potere speciale
         </label>
-        {isMaster && (
-          <label className="field" title="Riuscita = dado + caratteristica + modificatore + livello (0 = sempre)">
-            <span>Dado riuscita (Master)</span>
+      </div>
+
+      {isMaster && (
+        <div className={styles.row}>
+          <label className="field">
+            <span>Dado riuscita</span>
             <input
               className="input"
               type="number"
               min={0}
               max={20}
-              value={successDie}
+              value={forcedDie ?? successDie}
+              disabled={forcedDie !== null}
               onChange={(e) => setSuccessDie(e.target.value)}
-              placeholder="da fissare"
+              placeholder="—"
             />
           </label>
-        )}
-      </div>
+          <div className="field">
+            <span>Riuscita</span>
+            <output className={styles.target}>{shownTarget ?? '—'}</output>
+          </div>
+        </div>
+      )}
 
       <label className="field">
         <span>Descrizione</span>

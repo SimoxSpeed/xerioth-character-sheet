@@ -1,10 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import {
   castCost,
-  leadingNumber,
-  powerSuccessTarget,
   quickCastPercent,
-  rollBonus,
   scaleLeadingNumber,
   skillNextCost,
   type PowerSection,
@@ -12,7 +9,7 @@ import {
 import { NumberField } from '../../../../components/NumberField'
 import { AddIcon, CollapseIcon, DeleteIcon, DiceIcon, EditIcon, ExpandIcon, QuickCastIcon } from '../../../../components/icons'
 import { useIsMaster } from '../../../campaigns/api'
-import { attributeValues, skillLevel, useDeletePower, useUpdatePower, type CharacterSheet, type PowerRow } from '../../api'
+import { skillLevel, useDeletePower, useUpdatePower, type CharacterSheet, type PowerRow } from '../../api'
 import { AskMasterButton } from '../../../threads/AskMasterButton'
 import { useRollTrigger } from '../sheetContext'
 import { NoRoll, ProgressLine } from '../SheetBits'
@@ -75,7 +72,6 @@ export function PowersTab({ sheet, section }: { sheet: CharacterSheet; section: 
               sheet={sheet}
               power={power}
               section={section}
-              isMaster={isMaster}
               quickPct={activeQuickPct}
               onEdit={() => setDialog({ mode: 'edit', power })}
             />
@@ -99,7 +95,6 @@ interface CardProps {
   sheet: CharacterSheet
   power: PowerRow
   section: PowerSection
-  isMaster: boolean
   /** Lancio Rapido attivo: percentuale da applicare (0 = spento). */
   quickPct: number
   onEdit: () => void
@@ -110,17 +105,15 @@ interface CardProps {
  * clic sul livello = lo modifichi, clic sui punti = aggiungi/togli, clic sul resto = tiro.
  * Acquisizione, MAX, modifica ed elimina stanno nel dettaglio (freccia a destra).
  */
-function PowerCard({ sheet, power, section, isMaster, quickPct, onEdit }: CardProps) {
+function PowerCard({ sheet, power, section, quickPct, onEdit }: CardProps) {
   const update = useUpdatePower(sheet.id)
   const remove = useDeletePower(sheet.id)
   const [expanded, setExpanded] = useState(false)
 
-  // Costo: quello scritto ha la precedenza; la tabella A108 è un riferimento.
-  const tableCost = castCost(power.level, power.acquisition_level)
-  const writtenCost = power.cost.trim()
-  const hasWrittenCost = writtenCost !== '' && writtenCost.toUpperCase() !== 'ND'
-  const baseCost = hasWrittenCost ? writtenCost : tableCost !== null ? String(tableCost) : ''
-  const costDiffers = hasWrittenCost && tableCost !== null && leadingNumber(writtenCost) !== tableCost
+  // Costo: chi ha Punti Mana vede direttamente quello della tabella A108 (livello × acquisizione);
+  // tutti gli altri (es. Sacerdoti, Punti Spirito) quello scritto, così com'è ("ND" compreso).
+  const tableCost = section.resource === 'mana' ? castCost(power.level, power.acquisition_level) : null
+  const baseCost = tableCost !== null ? String(tableCost) : power.cost.trim()
 
   // Lancio Rapido attivo: tempo ridotto e costo aumentato della stessa percentuale.
   const quickTime = quickPct > 0 ? scaleLeadingNumber(power.cast_time, -quickPct) : null
@@ -139,20 +132,17 @@ function PowerCard({ sheet, power, section, isMaster, quickPct, onEdit }: CardPr
           attribute: section.attribute,
           level: power.level,
           isMaxed: power.is_maxed,
-          power: { successDie: power.success_die },
+          power: { successTarget: power.success_target },
         },
   )
   const rollable = power.level !== null
 
-  // Raggio, area, durata: sempre a vista sotto il nome.
+  // Raggio, area, durata: sempre a vista nel blocco Effetto ("—" se vuoti).
+  // Raggio e area uguali: un valore solo che occupa entrambe le colonne.
   const range = power.range.trim()
   const area = power.area.trim()
-  const facts = [
-    range && area && range === area ? { label: 'Raggio/Area', value: range } : null,
-    range && range !== area ? { label: 'Raggio', value: range } : null,
-    area && range !== area ? { label: 'Area', value: area } : null,
-    power.duration.trim() ? { label: 'Durata', value: power.duration.trim() } : null,
-  ].filter((f): f is { label: string; value: string } => f !== null)
+  const duration = power.duration.trim()
+  const sameRangeArea = range !== '' && range === area
 
   function confirmDelete() {
     if (window.confirm(`Eliminare "${power.name}"?`)) remove.mutate(power.id)
@@ -173,29 +163,9 @@ function PowerCard({ sheet, power, section, isMaster, quickPct, onEdit }: CardPr
     </NoRoll>
   )
 
-  // Riuscita come sul foglio: dado del Master + caratteristica + modificatore + livello.
-  // Solo il Master la modifica: scrive la riuscita, si salva il dado (riuscita − il resto).
-  const bonus = rollBonus(attributeValues(sheet)[section.attribute], power.level)
-  const successTarget = power.success_die === null ? null : powerSuccessTarget(power.success_die, bonus)
-  const successValue = isMaster ? (
-    <NoRoll>
-      <NumberField
-        className={styles.editable}
-        label={`Riuscita ${power.name}`}
-        value={successTarget}
-        nullable
-        min={bonus}
-        max={bonus + 20}
-        placeholder="—"
-        onCommit={(v) => update.mutate({ id: power.id, patch: { success_die: v === null ? null : v - bonus } })}
-      />
-    </NoRoll>
-  ) : (
-    (successTarget ?? '—')
-  )
-
-  // Gerarchia: il nome in evidenza; i quattro numeri in colonna a destra con etichette minime;
-  // raggio/area/durata e avanzamento quieti sotto il nome; dado solo al passaggio.
+  // Gerarchia: il nome in evidenza con l'avanzamento sotto; a destra tre blocchi
+  // Tiro (evidenziato) · Lancio · Effetto; dado a sinistra del Tiro, solo al passaggio.
+  // Riuscita: totale fissato dal Master (dado scelto nella modifica del potere), non si ricalcola.
   const body = (
     <>
       <div className={styles.main}>
@@ -205,16 +175,6 @@ function PowerCard({ sheet, power, section, isMaster, quickPct, onEdit }: CardPr
           {power.granted_by && <span className={styles.badgeGranted}>{power.granted_by}</span>}
           <ThreadDot characterId={sheet.id} targetType="power" targetId={power.id} />
         </div>
-
-        {facts.length > 0 && (
-          <p className={styles.facts}>
-            {facts.map((f) => (
-              <span key={f.label}>
-                {f.label} <b>{f.value}</b>
-              </span>
-            ))}
-          </p>
-        )}
 
         {power.is_maxed ? (
           // Al MAX la scritta prende il posto della barra
@@ -229,22 +189,45 @@ function PowerCard({ sheet, power, section, isMaster, quickPct, onEdit }: CardPr
         )}
       </div>
 
-      <div className={styles.stats}>
-        <Stat label="Liv" strong>
-          {levelValue}
-        </Stat>
-        <Stat label="Riuscita" muted={power.success_die === null}>
-          {successValue}
-        </Stat>
-        <Stat label="Costo" quick={!!quickCost} title={costDiffers ? `Tabella: ${tableCost}` : undefined}>
-          {shownCost}
-        </Stat>
-        <Stat label="Lancio" quick={!!quickTime}>
-          {shownTime}
-        </Stat>
-      </div>
+      <DiceIcon aria-hidden className={rollable ? styles.dice : styles.diceIdle} />
 
-      {rollable && <DiceIcon aria-hidden className={styles.dice} />}
+      <div className={styles.blocks}>
+        <div className={`${styles.block} ${styles.blockRoll}`}>
+          <Stat label="Liv" strong>
+            {levelValue}
+          </Stat>
+          <Stat label="Riuscita" muted={power.success_target === null}>
+            {power.success_target ?? '—'}
+          </Stat>
+        </div>
+        <div className={`${styles.block} ${styles.blockCast}`}>
+          <Stat label="Costo" quick={!!quickCost} muted={shownCost === '—'} title={shownCost}>
+            {shownCost}
+          </Stat>
+          <Stat label="Lancio" quick={!!quickTime} muted={shownTime === '—'} title={shownTime}>
+            {shownTime}
+          </Stat>
+        </div>
+        <div className={`${styles.block} ${styles.blockEffect}`}>
+          {sameRangeArea ? (
+            <Stat label="Raggio/Area" wide title={range}>
+              {range}
+            </Stat>
+          ) : (
+            <>
+              <Stat label="Raggio" muted={!range} title={range || undefined}>
+                {range || '—'}
+              </Stat>
+              <Stat label="Area" muted={!area} title={area || undefined}>
+                {area || '—'}
+              </Stat>
+            </>
+          )}
+          <Stat label="Durata" muted={!duration} title={duration || undefined}>
+            {duration || '—'}
+          </Stat>
+        </div>
+      </div>
     </>
   )
 
@@ -288,8 +271,6 @@ function PowerCard({ sheet, power, section, isMaster, quickPct, onEdit }: CardPr
             </label>
             <span className={styles.meta}>
               {quickCost && <>Senza Lancio Rapido: {baseCost} / {power.cast_time || '—'}</>}
-              {!hasWrittenCost && tableCost !== null && <> · Costo da tabella</>}
-              {costDiffers && <> · Tabella: {tableCost}</>}
             </span>
             <span className={styles.detailActions}>
               <button
@@ -321,11 +302,13 @@ function PowerCard({ sheet, power, section, isMaster, quickPct, onEdit }: CardPr
   )
 }
 
+/** Un valore della riga: etichetta sopra, numero sotto. */
 function Stat({
   label,
   strong,
   muted,
   quick,
+  wide,
   title,
   children,
 }: {
@@ -333,12 +316,14 @@ function Stat({
   strong?: boolean
   muted?: boolean
   quick?: boolean
+  /** Occupa due colonne del blocco (Raggio/Area uguali). */
+  wide?: boolean
   title?: string
   children: ReactNode
 }) {
   return (
     <span
-      className={`${styles.stat} ${strong ? styles.statStrong : ''} ${muted ? styles.statMuted : ''} ${quick ? styles.statQuick : ''}`}
+      className={`${styles.stat} ${strong ? styles.statStrong : ''} ${muted ? styles.statMuted : ''} ${quick ? styles.statQuick : ''} ${wide ? styles.statWide : ''}`}
       title={title}
     >
       <small>{label}</small>

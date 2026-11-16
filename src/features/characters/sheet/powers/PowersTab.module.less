@@ -1,6 +1,7 @@
 @import '../../../../styles/tokens.less';
 
 .tab {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   gap: @space-4;
@@ -80,16 +81,25 @@ input.search {
   flex: 1;
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 16px;
+  // Come le capacità: il dado sta a sinistra del livello
+  grid-template-columns: minmax(0, 1fr) 18px auto;
   align-items: center;
   gap: @space-3;
   padding: 10px @space-2 10px @space-3;
   border-radius: @radius-sm;
+}
 
-  @media @bp-mobile {
+// Pannello stretto: i tre blocchi vanno sotto il nome (e il dado sparisce)
+@container (max-width: 820px) {
+  .grid {
     grid-template-columns: minmax(0, 1fr);
     gap: @space-2;
     padding: 10px 4px 10px @space-2;
+  }
+
+  .dice,
+  .dice-idle {
+    display: none;
   }
 }
 
@@ -100,6 +110,11 @@ input.search {
   &:hover .dice,
   &:focus-visible .dice {
     opacity: 1;
+  }
+
+  &:hover .dice {
+    color: var(--accent);
+    transform: rotate(-12deg) scale(1.1);
   }
 }
 
@@ -149,21 +164,6 @@ input.search {
   color: var(--info);
 }
 
-// Raggio, area, durata: una riga tenue
-.facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 12px;
-  margin: 0;
-  font-size: 12.5px;
-  color: var(--text-muted);
-
-  b {
-    font-weight: 600;
-    color: var(--text-soft);
-  }
-}
-
 // Avanzamento: linea sottile, numeri piccoli e quieti
 .progress-line {
   display: flex;
@@ -192,39 +192,99 @@ input.search {
   max-width: 280px;
 }
 
-// I quattro numeri in linea: "Liv 4  Riuscita 6  Costo 15  Lancio 3" (niente tabella)
-.stats {
+// --- Tre blocchi a destra: Tiro (evidenziato) · Lancio · Effetto -----------------
+// Ogni blocco ha colonne a larghezza fissa, così i valori sono incolonnati in ogni riga
+// qualunque cosa ci sia scritto ("ND", "Istant.", "100 / ora"). Larghezza = la maggiore tra
+// etichetta ("RIUSCITA") e valore tipico; i testi rari più lunghi vanno coi puntini.
+.blocks {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px 16px;
+  align-items: stretch;
+  gap: 6px;
+}
 
-  @media @bp-mobile {
-    justify-content: flex-start;
+.block {
+  display: grid;
+  column-gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--frame-soft) 60%, transparent);
+  border-radius: @radius-sm;
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+
+  // Nei blocchi tenui i valori pesano meno
+  .stat b {
+    font-size: 15px;
+    color: var(--text-soft);
+  }
+
+  .stat-muted b {
+    color: var(--text-muted);
   }
 }
 
+// Tiro: quello che serve al tavolo, in evidenza
+.block-roll {
+  grid-template-columns: 40px 68px;
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: var(--accent-soft);
+
+  .stat b {
+    font-size: 17px;
+    color: var(--text);
+  }
+
+  .stat-strong b {
+    font-size: 23px;
+  }
+
+  .stat-muted b {
+    color: var(--text-muted);
+  }
+
+  .stat small {
+    color: var(--accent-strong);
+  }
+}
+
+.block-cast {
+  grid-template-columns: 56px 70px;
+}
+
+.block-effect {
+  grid-template-columns: 62px 62px 76px;
+}
+
 .stat {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  // Etichette allineate in alto, valori in basso (il livello è più grande degli altri)
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  align-items: end;
+  row-gap: 3px;
   min-width: 0;
+  text-align: center;
+
+  > small {
+    align-self: start;
+  }
 
   small {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
+    line-height: 1;
     text-transform: uppercase;
     color: var(--text-muted);
     white-space: nowrap;
   }
 
+  // Testo troppo lungo per la colonna: puntini, il valore intero è nel tooltip
   b {
-    display: inline-flex;
-    align-items: center;
-    line-height: 1;
-    gap: 4px;
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
     white-space: nowrap;
     font-size: 17px;
     font-weight: 700;
@@ -234,16 +294,25 @@ input.search {
 }
 
 // Il livello pesa di più
-.stat-strong b {
-  font-family: @font-display;
-  font-size: 23px;
-  line-height: 1;
+.stat-strong {
+  b {
+    overflow: visible; // il campo di modifica del livello non va tagliato
+    font-family: @font-display;
+    font-size: 23px;
+    line-height: 1;
+  }
 }
 
 .stat-muted b {
   color: var(--text-muted);
 }
 
+// Raggio e area uguali: un valore solo su due colonne
+.stat-wide {
+  grid-column: span 2;
+}
+
+.block .stat-quick b,
 .stat-quick b {
   color: var(--c-gold);
 }
@@ -262,16 +331,22 @@ input.search {
   line-height: 16px;
 }
 
+// Stesso dado delle capacità: più grande, tenue, si accende al passaggio
 .dice {
-  width: 16px !important;
-  height: 16px !important;
-  color: var(--accent);
+  width: 18px !important;
+  height: 18px !important;
+  color: var(--text-muted);
   opacity: 0;
-  transition: opacity 0.12s;
+  transition:
+    opacity 0.12s,
+    color 0.12s,
+    transform 0.15s;
+}
 
-  @media @bp-mobile {
-    display: none;
-  }
+// Potere NA: niente dado, ma la colonna resta allineata
+.dice-idle {
+  .dice();
+  visibility: hidden;
 }
 
 .expand {

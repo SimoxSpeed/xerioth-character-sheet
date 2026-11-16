@@ -218,53 +218,97 @@ input.physical {
   }
 }
 
-.result-detail {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-soft);
-  font-variant-numeric: tabular-nums;
+// Più dadi: piccoli, in fila (vanno a capo), poi il totale sotto
+.die-small {
+  width: 64px;
+  height: 64px;
+
+  .die-value {
+    top: 3px;
+    font-size: 21px;
+  }
 }
 
-.succeeded,
-.failed {
-  font-family: @font-display;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.succeeded {
-  color: var(--success);
-}
-
-.failed {
-  color: var(--danger);
-}
-
-.outcomes {
+.multi {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: @space-2;
+  gap: @space-3;
+  width: 100%;
 }
 
-.picked-success {
-  background: var(--success) !important;
-  border-color: var(--success) !important;
-  color: var(--surface) !important;
+.multi-dice {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
 }
 
-.picked-failure {
-  background: var(--danger) !important;
-  border-color: var(--danger) !important;
-  color: var(--surface) !important;
+.multi-total {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.3s,
+    transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  small {
+    .sheet-label();
+  }
+
+  b {
+    font-family: @font-display;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 0.95;
+    color: var(--accent-strong);
+    font-variant-numeric: tabular-nums;
+  }
 }
 
+.multi-total-shown {
+  opacity: 1;
+  transform: none;
+}
 
-// Sopra / Sotto al posto del numero
-.die-text {
-  top: 4px;
-  font-size: 22px;
+// Ritiro del fallimento: il secondo dado entra sotto al primo crescendo in altezza,
+// così la finestra si allarga e il primo sale per fargli spazio.
+.second-stage {
+  display: grid;
+  grid-template-rows: 1fr;
+  width: 100%;
+  animation: second-stage-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  // Tagliato solo mentre cresce: poi ombra e bagliore del 20 restano interi
+  > div {
+    min-height: 0;
+    animation: clip-while-growing 0.4s;
+  }
+}
+
+@keyframes clip-while-growing {
+  from,
+  to {
+    overflow: hidden;
+  }
+}
+
+@keyframes second-stage-in {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+  to {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+.again-button {
+  align-self: center;
 }
 
 // --- Tiro libero ----------------------------------------------------------------
@@ -429,5 +473,10 @@ input.physical {
   .stage-die,
   .total {
     transition: none;
+  }
+
+  .second-stage,
+  .second-stage > div {
+    animation: none;
   }
 }

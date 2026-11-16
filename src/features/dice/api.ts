@@ -123,12 +123,3 @@ export function useSaveRoll() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['dice'] }),
   })
 }
-
-export function useSetRollOutcome() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async ({ id, outcome }: { id: string; outcome: RollOutcome | null }) =>
-      unwrap(await supabase.from('dice_rolls').update({ outcome }).eq('id', id)),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['dice'] }),
-  })
-}

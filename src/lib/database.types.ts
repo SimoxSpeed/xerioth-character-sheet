@@ -233,6 +233,7 @@ export type Database = {
           range: string
           sort_order: number
           success_die: number | null
+          success_target: number | null
           updated_at: string
         }
         Insert: {
@@ -255,6 +256,7 @@ export type Database = {
           range?: string
           sort_order?: number
           success_die?: number | null
+          success_target?: number | null
           updated_at?: string
         }
         Update: {
@@ -277,6 +279,7 @@ export type Database = {
           range?: string
           sort_order?: number
           success_die?: number | null
+          success_target?: number | null
           updated_at?: string
         }
         Relationships: [
