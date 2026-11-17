@@ -1,7 +1,7 @@
 import { Link } from 'react-router'
 import { useUser } from '../auth/AuthProvider'
 import { useCharacters } from './api'
-import { useMemberships, type Membership } from '../campaigns/api'
+import { useMemberships, useMyPendingRequests, type Membership } from '../campaigns/api'
 import { classesLabel, raceLabel } from './labels'
 import styles from './HomePage.module.less'
 import { AddIcon } from '../../components/icons'
@@ -12,24 +12,43 @@ export function HomePage() {
   if (isPending) return <p className="muted">Caricamento…</p>
   if (error) return <p className="error-box">Errore: {error.message}</p>
 
-  if (memberships.length === 0) {
-    return (
-      <section className={`card ${styles.empty}`}>
-        <h1>Benvenuto</h1>
-        <p>
-          Non fai ancora parte di nessuna campagna. Chiedi al Master di aggiungerti: per ora l’iscrizione alle
-          campagne si fa dal database.
-        </p>
-      </section>
-    )
-  }
-
   return (
     <div className={styles.page}>
+      <div className={styles.toolbar}>
+        <Link to="/campagne/nuova" className="btn">
+          <AddIcon aria-hidden /> Nuova campagna
+        </Link>
+      </div>
+
+      {memberships.length === 0 && (
+        <section className={`card ${styles.empty}`}>
+          <p>Non fai parte di nessuna campagna.</p>
+        </section>
+      )}
+
       {memberships.map((m) => (
         <CampaignSection key={m.campaign.id} membership={m} />
       ))}
+
+      <PendingRequests />
     </div>
+  )
+}
+
+/** Richieste di ingresso inviate con un link d'invito, in attesa del Master. */
+function PendingRequests() {
+  const { data: requests } = useMyPendingRequests()
+  if (!requests || requests.length === 0) return null
+
+  return (
+    <ul className={styles.requests}>
+      {requests.map((r) => (
+        <li key={r.id} className={`card ${styles.request}`}>
+          <strong>{r.campaign?.name ?? '—'}</strong>
+          <span className={styles.pending}>In attesa</span>
+        </li>
+      ))}
+    </ul>
   )
 }
 

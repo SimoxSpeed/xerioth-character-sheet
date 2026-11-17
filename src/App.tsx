@@ -1,6 +1,8 @@
 import { Route, Routes } from 'react-router'
 import { Layout } from './components/Layout'
 import { LoginPage } from './features/auth/LoginPage'
+import { InvitePage } from './features/campaigns/InvitePage'
+import { NewCampaignPage } from './features/campaigns/NewCampaignPage'
 import { RequireAuth } from './features/auth/RequireAuth'
 import { HomePage } from './features/characters/HomePage'
 import { NewCharacterPage } from './features/characters/NewCharacterPage'
@@ -21,7 +23,9 @@ export function App() {
         }
       >
         <Route index element={<HomePage />} />
+        <Route path="campagne/nuova" element={<NewCampaignPage />} />
         <Route path="campagne/:campaignId/nuovo-personaggio" element={<NewCharacterPage />} />
+        <Route path="invito/:inviteId" element={<InvitePage />} />
         <Route path="personaggi/:characterId" element={<CharacterSheetPage />} />
         <Route path="campagne/:campaignId/master" element={<MasterPanelPage />} />
         <Route path="*" element={<p className="muted">Pagina non trovata.</p>} />

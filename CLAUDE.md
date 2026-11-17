@@ -40,7 +40,7 @@ Prima di dichiarare finito un lavoro su `.ts`/`.tsx`: `npm run typecheck`; se ha
 - Niente Supabase CLI né Docker. Le migrazioni si scrivono in `supabase/migrations/AAAAMMGGHHMMSS_nome.sql` e si applicano con l'MCP `supabase` (`apply_migration`).
 - Dopo ogni migrazione: rinomina il file con la versione che il database ha registrato (`list_migrations`: l'MCP usa l'orario dell'applicazione, non il nome del file), poi `generate_typescript_types` in `src/lib/database.types.ts`, `get_advisors` per la sicurezza e aggiorna `docs/02-database.md`.
 - L'integrazione GitHub di Supabase controlla le migrazioni a ogni push su `main` ("Supabase Preview"): fallisce se una versione del database non ha il file con lo stesso numero.
-- I permessi stanno nelle policy RLS: il giocatore vede solo le sue schede, il Master (per campagna, assegnato da DB) tutte quelle della campagna, i tiri sono visibili a tutto il gruppo.
+- I permessi stanno nelle policy RLS: il giocatore vede solo le sue schede, il Master (per campagna: chi la crea o chi entra con un invito da Master) tutte quelle della campagna, i tiri sono visibili a tutto il gruppo.
 
 ## Git
 

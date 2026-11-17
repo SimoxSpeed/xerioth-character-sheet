@@ -5,6 +5,7 @@ import { DIE_LABELS, coinLabel, rollValuesText, currentHp, maxHp } from '../../g
 import { ProgressBar } from '../../components/ProgressBar'
 import { useUser } from '../auth/AuthProvider'
 import { useIsMaster, useMemberships } from '../campaigns/api'
+import { CampaignAdmin } from '../campaigns/CampaignAdmin'
 import { classesLabel } from '../characters/labels'
 import { SLOT_LABELS } from '../characters/sheet/sheetHelpers'
 import { OUTCOME_LABELS, useCampaignRolls, useDiceRealtime } from '../dice/api'
@@ -38,6 +39,8 @@ export function MasterPanelPage() {
         <PendingQuestions campaignId={campaignId} />
         <GroupRolls campaignId={campaignId} />
       </div>
+
+      {campaign && <CampaignAdmin campaign={campaign} />}
 
       <Party campaignId={campaignId} />
     </div>

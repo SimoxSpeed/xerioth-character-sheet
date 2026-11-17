@@ -27,7 +27,7 @@ Sostituire le schede personaggio su Google Sheets del gioco di ruolo **Xerioth**
 
 - **Frontend**: React + TypeScript con Vite; stili in **LESS**.
 - **Backend**: Supabase (Postgres + autenticazione + realtime).
-- **Campagne separate** fin da subito. Il ruolo **Master** è per campagna e si assegna **da database**.
+- **Campagne separate** fin da subito. Ogni utente può stare in **più campagne** (Master in una, giocatore in un'altra) e avere **più personaggi** in ciascuna. **Chiunque** crea una campagna dall'app e ne diventa Master; gli altri entrano con un **link d'invito** (giocatore o Master, monouso o riutilizzabile, valido 7 giorni) e il Master **approva** la richiesta.
 - **Dati statici su git** (tabelle, razze, classi, divinità, allineamenti, catalogo capacità). **Dati personali nel database** (personaggi, diari, domande, tiri).
 - Un giocatore vede **solo le proprie schede**; il Master vede tutte quelle della sua campagna. I **tiri** sono visibili a tutto il gruppo.
 - **Niente approvazione** per salire di livello: al suo posto ci sono le **domande al Master** su qualsiasi elemento.

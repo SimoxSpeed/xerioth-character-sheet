@@ -10,9 +10,11 @@ Lingua: italiano. Pensata per il **tavolo da gioco**: portatile e telefono hanno
 |---|---|---|
 | `/accesso` | Accedi con Google, oppure email + password; cambio tema in alto a destra; link "Privacy" in fondo | tutti |
 | `/privacy` | Privacy policy (richiesta da Google per pubblicare l'accesso con Google) | tutti, anche senza accesso |
-| `/` | **Le mie campagne e i miei personaggi** (il Master vede tutti i personaggi della sua campagna) | tutti |
+| `/` | **Le mie campagne e i miei personaggi**: una sezione per ogni campagna, con il proprio ruolo e "Nuovo personaggio" (più personaggi per campagna); il Master vede tutti i personaggi della sua campagna. Pulsante **"Nuova campagna"**. Sotto, le **richieste di ingresso in attesa** (nome della campagna, "In attesa") | tutti |
+| `/campagne/nuova` | **Nuova campagna**: nome e descrizione; chi la crea ne diventa Master e va al pannello Master per invitare gli altri | tutti |
+| `/invito/:id` | **Invito**: nome della campagna e pulsante "Chiedi di entrare". Se c'è già una richiesta: "In attesa" o "Richiesta rifiutata"; se si è già membri: link alla home; se l'invito non vale più: "Invito scaduto" / "Invito revocato" / "Invito già usato". Senza accesso passa da `/accesso` e torna qui | tutti |
 | `/personaggi/:id` | **Scheda personaggio** | proprietario, Master |
-| `/master` | **Pannello Master** (Fase 2) | Master |
+| `/campagne/:id/master` | **Pannello Master** (Fase 2) | Master |
 | `/compendio` | Allineamenti, divinità, razze, classi, catalogo capacità e requisiti (dati da git, sola lettura) | tutti |
 | `/mondo/...` | Pagine informative a moduli (Fase 3), es. `/mondo/pantheon`, `/mondo/png/sereena` | in base alla visibilità |
 
@@ -179,6 +181,11 @@ Ogni tiro va nel registro della campagna, visibile al gruppo secondo le regole d
 - **Domande in attesa** (incluse le preghiere), con notifica.
 - **Tiri del gruppo** in tempo reale.
 - **Riepilogo personaggi**: PF attuali/massimi, **armi e armature equipaggiate**, risorse (Mana / Spirito / Mente / Anima).
+- **Campagna**: nome e descrizione, modificabili.
+- **Membri**:
+  - **Richieste** in attesa: nome, ruolo richiesto, data; pulsanti Accetta / Rifiuta. Si vedono solo qui, senza avvisi in home.
+  - **Membri** della campagna con il ruolo; accanto ai **giocatori** (non a sé stessi né agli altri Master) il pulsante Rimuovi, con conferma. Le schede del giocatore restano.
+  - **Inviti**: "Nuovo invito" con due scelte, *Giocatore / Master* e *Monouso / Riutilizzabile*; dopo la creazione il link si copia con un clic. Elenco degli inviti attivi: ruolo, tipo, scadenza, utilizzi, Copia, Revoca.
 - In seguito: **iniziativa** (ordine dei turni).
 
 ---
@@ -193,7 +200,7 @@ src/
   lib/supabase.ts  client Supabase
   features/
     auth/          accesso, sessione
-    campaigns/     campagne, ruolo nella campagna
+    campaigns/     campagne, ruolo, inviti e membri
     characters/    elenco, creazione, scheda
     skills/        capacità, catalogo, requisiti
     powers/        miracoli/incantesimi/poteri mentali

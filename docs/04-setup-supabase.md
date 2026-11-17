@@ -61,7 +61,7 @@ Senza MCP si possono comunque applicare a mano: *SQL Editor → New query*, inco
 
 ## Passo 6 — Campagna e ruolo Master *(io via MCP, oppure tu da SQL Editor)*
 
-Dopo che ti sei registrato nell'app:
+Non serve più: le campagne si creano dall'app ("Nuova campagna") e chi le crea ne è Master; gli altri entrano con un link d'invito dal pannello Master. L'SQL resta per i casi da sistemare a mano:
 
 ```sql
 insert into campaigns (name) values ('Xerioth') returning id;

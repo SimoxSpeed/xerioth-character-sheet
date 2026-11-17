@@ -6,12 +6,41 @@
   gap: @space-6;
 }
 
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -@space-4;
+}
+
 .empty {
   max-width: 560px;
 
-  h1 {
-    margin-bottom: @space-2;
+  p {
+    margin: 0;
   }
+}
+
+.requests {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+}
+
+.request {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: @space-3;
+  max-width: 560px;
+}
+
+.pending {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--info);
 }
 
 .campaign {

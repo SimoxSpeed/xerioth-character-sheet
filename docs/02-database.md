@@ -61,6 +61,9 @@ Una classe descrive **cosa ha** un personaggio di quella classe, in modo che la 
 erDiagram
   profiles ||--o{ campaign_members : ""
   campaigns ||--o{ campaign_members : ""
+  campaigns ||--o{ campaign_invites : ""
+  campaign_invites ||--o{ campaign_join_requests : ""
+  profiles ||--o{ campaign_join_requests : "chiede"
   campaigns ||--o{ characters : ""
   profiles ||--o{ characters : "possiede"
   characters ||--o{ character_classes : ""
@@ -96,20 +99,61 @@ erDiagram
 |---|---|---|
 | `campaign_id` | → campaigns | PK composta |
 | `user_id` | → profiles | PK composta |
-| `role` | enum `member_role` (`player`, `master`) | **si cambia solo da database** |
+| `role` | enum `member_role` (`player`, `master`) | si assegna all'ingresso (dall'invito); **non si cambia dall'app** |
 
-Il Master è tale **per campagna**: in una campagna diversa può essere un'altra persona. Per ora membri e ruoli si gestiscono da SQL Editor:
+Il Master è tale **per campagna**: in una campagna diversa può essere un'altra persona. Ogni utente può far parte di **più campagne**, con un ruolo diverso in ciascuna, e avere **più personaggi** nella stessa campagna.
 
-```sql
--- crea la campagna
-insert into campaigns (name) values ('Xerioth') returning id;
+**Qualsiasi utente** può creare una campagna dall'app (funzione `create_campaign`): ne diventa il primo Master. Gli altri entrano con gli **inviti** (§2.1b). Il Master modifica nome e descrizione dal pannello (policy `campaigns_update_master`, già presente).
 
--- aggiungi un utente come master (o 'player')
-insert into campaign_members (campaign_id, user_id, role)
-select '<id-campagna>', id, 'master' from auth.users where email = 'email@esempio.it';
-```
+Nessuna policy permette di inserire o modificare righe di `campaign_members` dall'app: si entra solo creando la campagna o con una richiesta accettata (funzione `decide_join_request`). Il Master può **cancellare** le righe dei **giocatori** della sua campagna (policy `campaign_members_delete_master`, non sé stesso e non altri Master).
 
-Un trigger impedisce a chiunque di cambiare il proprio ruolo dall'app.
+### 2.1b Inviti e richieste di ingresso
+
+> ✅ **Applicata** il 17/11/2026 (`20261117211321_campaign_invites.sql`), con la creazione delle campagne e l'accesso ai personaggi legato all'appartenenza alla campagna. Per gli inviti l'app può scrivere solo le colonne `campaign_id`, `role`, `single_use` (creazione) e `revoked_at` (revoca); un vincolo fissa `expires_at` a `created_at` + 7 giorni.
+
+1. Il Master crea un **invito** dal pannello e ne copia il link `https://xerioth-character-sheet.pages.dev/invito/<id>`.
+2. Chi apre il link accede (o si registra) e preme il pulsante: nasce una **richiesta in attesa**.
+3. Il Master la **accetta** (l'utente entra con il ruolo dell'invito) o la **rifiuta**.
+
+**`campaign_invites`**
+| Colonna | Tipo | Note |
+|---|---|---|
+| `id` | uuid PK | è anche il token del link (casuale, non indovinabile) |
+| `campaign_id` | → campaigns | |
+| `role` | `member_role` | `player` o `master`: ruolo di chi entra con questo invito |
+| `single_use` | bool | `true` = monouso, `false` = riutilizzabile |
+| `expires_at` | timestamptz | `created_at` + **7 giorni** (default, l'app non lo invia) |
+| `revoked_at` | timestamptz nullable | revocato dal Master |
+| `created_by` | → profiles | |
+| `created_at` | timestamptz | |
+
+Un invito è **valido** se non è revocato, non è scaduto e, se monouso, non ha ancora nessuna richiesta. Il monouso si consuma alla **richiesta** (anche se poi viene rifiutata), così il link non può girare ad altri. Gli utilizzi di un invito sono il numero delle sue richieste.
+
+**`campaign_join_requests`**
+| Colonna | Tipo | Note |
+|---|---|---|
+| `id` | uuid PK | |
+| `invite_id` | → campaign_invites | |
+| `campaign_id` | → campaigns | copiato dall'invito |
+| `user_id` | → profiles | chi chiede di entrare |
+| `role` | `member_role` | copiato dall'invito |
+| `status` | enum `join_request_status` (`pending`, `accepted`, `rejected`) | |
+| `decided_by` | → profiles nullable | Master che ha deciso |
+| `decided_at` | timestamptz nullable | |
+| `created_at` | timestamptz | |
+
+Al massimo **una richiesta `pending`** per utente e campagna (indice unico parziale) e **una richiesta per utente e invito** (vincolo unico): dopo un rifiuto, con quell'invito non si può più chiedere, serve un invito nuovo. Le richieste si vedono **solo nel pannello Master**, senza avvisi in home.
+
+**Funzioni** (`security definer`, eseguibili dagli utenti autenticati):
+
+| Funzione | Chi | Cosa fa |
+|---|---|---|
+| `create_campaign(name, description)` | qualsiasi utente | crea la campagna e inserisce chi la crea in `campaign_members` come `master`; restituisce l'id |
+| `invite_info(invite_id)` | chiunque abbia il link | nome della campagna, ruolo, stato dell'invito (`valid`, `expired`, `revoked`, `used`), se l'utente è già membro e lo stato della sua richiesta con quell'invito (nessuna, `pending`, `rejected`). Serve perché chi non è membro non può leggere la campagna |
+| `request_to_join(invite_id)` | chiunque abbia il link | controlla l'invito e crea la richiesta `pending`; errore se l'invito non è valido, se l'utente è già membro o ha già una richiesta con quell'invito |
+| `decide_join_request(request_id, accept)` | Master della campagna | segna la richiesta `accepted`/`rejected`; se accettata inserisce la riga in `campaign_members` con il ruolo della richiesta |
+
+**Rimozione di un giocatore**: si cancella la sua riga di `campaign_members`. **I personaggi restano**: il Master continua a vederli, il giocatore no finché non rientra (vedi §3).
 
 ### 2.2 Personaggio
 
@@ -300,9 +344,16 @@ L'uso dei Punti Fato **non** si registra.
 
 | Chi | Può |
 |---|---|
-| **Giocatore** | leggere e modificare **solo i propri** personaggi (e tabelle figlie); vedere i tiri pubblici della propria campagna |
-| **Master** (della campagna) | leggere e modificare **tutti** i personaggi della campagna, ma **non tirare** sui personaggi altrui; rispondere alle domande |
-| **Nessuno** dall'app | cambiare ruoli o appartenenza alle campagne |
+| **Giocatore** | leggere e modificare **solo i propri** personaggi (e tabelle figlie) **delle campagne di cui è membro**; vedere i tiri pubblici della propria campagna; vedere le proprie richieste di ingresso e il nome delle campagne a cui le ha inviate |
+| **Qualsiasi utente** | creare una campagna (ne diventa Master) |
+| **Master** (della campagna) | leggere e modificare **tutti** i personaggi della campagna, ma **non tirare** sui personaggi altrui; modificare nome e descrizione della campagna; rispondere alle domande; creare e revocare inviti; accettare o rifiutare le richieste (e vedere il nome di chi chiede); rimuovere i giocatori |
+| **Nessuno** dall'app | cambiare ruoli; entrare in una campagna senza invito e richiesta accettata; rimuovere un Master |
+
+- Il proprietario accede ai suoi personaggi **solo se è membro** della loro campagna: le regole su `characters` e le funzioni `can_access_character` / `is_character_owner` controllano anche `is_campaign_member`. Così un giocatore rimosso non vede più le schede di quella campagna, ma restano al loro posto.
+- `campaign_invites`: lettura, creazione e revoca (`revoked_at`) solo per il Master della campagna.
+- `campaign_join_requests`: lettura per chi ha chiesto e per il Master della campagna; nessuna scrittura diretta (solo dalle funzioni del §2.1b).
+- `campaigns`: leggibile anche da chi ha una richiesta `pending` verso la campagna (per mostrarne il nome).
+- `profiles`: leggibile anche dal Master di una campagna verso cui l'utente ha una richiesta `pending`.
 
 - Le voci di diario `private` le vede solo l'autore, quindi neanche il Master.
 - I giocatori **non** vedono le schede degli altri. Più avanti si può aggiungere una "vista party" con le sole info pubbliche (nome, razza, classi, livello, ritratto).

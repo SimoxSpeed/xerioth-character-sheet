@@ -17,6 +17,119 @@ export type Database = {
   }
   public: {
     Tables: {
+      campaign_invites: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          revoked_at: string | null
+          role: Database["public"]["Enums"]["member_role"]
+          single_use: boolean
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          revoked_at?: string | null
+          role?: Database["public"]["Enums"]["member_role"]
+          single_use?: boolean
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          revoked_at?: string | null
+          role?: Database["public"]["Enums"]["member_role"]
+          single_use?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_invites_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_invites_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_join_requests: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          invite_id: string
+          role: Database["public"]["Enums"]["member_role"]
+          status: Database["public"]["Enums"]["join_request_status"]
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          invite_id: string
+          role: Database["public"]["Enums"]["member_role"]
+          status?: Database["public"]["Enums"]["join_request_status"]
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          invite_id?: string
+          role?: Database["public"]["Enums"]["member_role"]
+          status?: Database["public"]["Enums"]["join_request_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_join_requests_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_join_requests_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_join_requests_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_invites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_join_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_members: {
         Row: {
           campaign_id: string
@@ -821,7 +934,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_campaign: {
+        Args: { p_description?: string; p_name: string }
+        Returns: string
+      }
+      decide_join_request: {
+        Args: { p_accept: boolean; p_request_id: string }
+        Returns: undefined
+      }
+      invite_info: {
+        Args: { p_invite_id: string }
+        Returns: {
+          campaign_id: string
+          campaign_name: string
+          is_member: boolean
+          request_status: Database["public"]["Enums"]["join_request_status"]
+          role: Database["public"]["Enums"]["member_role"]
+          status: string
+        }[]
+      }
+      request_to_join: { Args: { p_invite_id: string }; Returns: undefined }
     }
     Enums: {
       attribute_key:
@@ -834,6 +966,7 @@ export type Database = {
       die_kind: "d20" | "d4" | "coin" | "d6" | "d8" | "d10" | "d12" | "d100"
       item_category: "usable" | "equipment"
       item_slot: "weapon" | "armor"
+      join_request_status: "pending" | "accepted" | "rejected"
       journal_kind:
         | "prayer"
         | "note"
@@ -994,6 +1127,7 @@ export const Constants = {
       die_kind: ["d20", "d4", "coin", "d6", "d8", "d10", "d12", "d100"],
       item_category: ["usable", "equipment"],
       item_slot: ["weapon", "armor"],
+      join_request_status: ["pending", "accepted", "rejected"],
       journal_kind: [
         "prayer",
         "note",

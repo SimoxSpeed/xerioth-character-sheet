@@ -56,6 +56,11 @@ export {
   Swords as SkillsIcon,
   Undo2 as UndoIcon,
   WandSparkles as PowersIcon,
+  // Campagne e inviti
+  Ban as RevokeIcon,
+  Copy as CopyIcon,
+  UserMinus as RemoveMemberIcon,
+  UserPlus as InviteIcon,
 } from 'lucide-react'
 export type { LucideIcon } from 'lucide-react'
 export { GoogleIcon } from './GoogleIcon'
