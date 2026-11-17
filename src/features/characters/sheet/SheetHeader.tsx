@@ -31,8 +31,9 @@ import {
   type CharacterSheet,
 } from '../api'
 import { classesLabel, raceLabel } from '../labels'
-import { CounterDialog, HpDialog, XpDialog } from './VitalDialogs'
+import { CounterDialog, HpDialog, XpDialog, type HpFlash } from './VitalDialogs'
 import styles from './SheetHeader.module.less'
+import flashStyles from './HpFlash.module.less'
 
 type Editor = 'hp' | 'xp' | 'madness' | 'fate' | 'gold' | { resource: string } | null
 
@@ -59,7 +60,7 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
   const addXp = useAddXp(sheet.id)
   const toast = useToast()
   const [editor, setEditor] = useState<Editor>(null)
-  const [hpFlash, setHpFlash] = useState<{ kind: 'damage' | 'heal'; n: number } | null>(null)
+  const [hpFlash, setHpFlash] = useState<HpFlash | null>(null)
   const [details, setDetails] = useState(false)
 
   const attributes = attributeValues(sheet)
@@ -104,6 +105,13 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
     })
   }
 
+  /** PF scritti a mano: la differenza diventa danno o cura. */
+  function setHp(value: number) {
+    const delta = value - hp
+    if (delta < 0) changeHp('damage', -delta)
+    else if (delta > 0) changeHp('heal', delta)
+  }
+
   function changeXp(delta: number) {
     const safe = Math.max(delta, -total)
     if (!safe) return
@@ -126,7 +134,7 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
     }
   })
   const openResource = editor && typeof editor === 'object' ? resources.find((r) => r.key === editor.resource) : undefined
-  const flashClass = hpFlash ? (hpFlash.kind === 'damage' ? styles.flashDamage : styles.flashHeal) : ''
+  const flashClass = hpFlash ? (hpFlash.kind === 'damage' ? flashStyles.flashDamage : flashStyles.flashHeal) : ''
 
   // --- Pezzi condivisi tra desktop e telefono -----------------------------------
   const portrait = (className: string | undefined) => (
@@ -321,7 +329,9 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
         sheet={sheet}
         hp={hp}
         hpMax={hpMax}
+        flash={hpFlash}
         onChange={changeHp}
+        onSetHp={setHp}
         onSet={(patch) => update.mutate(patch)}
       />
       <XpDialog

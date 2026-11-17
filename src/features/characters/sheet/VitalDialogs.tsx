@@ -6,6 +6,7 @@ import { ProgressBar } from '../../../components/ProgressBar'
 import { AddIcon, HpIcon, LevelIcon, MinusIcon, XpIcon, type LucideIcon } from '../../../components/icons'
 import type { CharacterSheet } from '../api'
 import styles from './VitalDialogs.module.less'
+import flashStyles from './HpFlash.module.less'
 
 const fmt = (n: number) => n.toLocaleString('it-IT')
 
@@ -71,13 +72,21 @@ function AmountPad({
   )
 }
 
+/** Ultimo danno o cura: `n` cambia a ogni modifica e fa ripartire l'animazione. */
+export interface HpFlash {
+  kind: 'damage' | 'heal'
+  n: number
+}
+
 export function HpDialog({
   open,
   onClose,
   sheet,
   hp,
   hpMax,
+  flash,
   onChange,
+  onSetHp,
   onSet,
 }: {
   open: boolean
@@ -85,16 +94,22 @@ export function HpDialog({
   sheet: CharacterSheet
   hp: number
   hpMax: number | null
+  flash: HpFlash | null
   onChange: (kind: 'damage' | 'heal', amount: number) => void
+  /** PF attuali scritti a mano. */
+  onSetHp: (value: number) => void
   onSet: (patch: Partial<Pick<CharacterSheet, 'damage_taken' | 'temp_hp' | 'hp_bonus'>>) => void
 }) {
   const max = hpMax ?? 0
+  const flashClass = flash ? (flash.kind === 'damage' ? flashStyles.flashDamage : flashStyles.flashHeal) : ''
   return (
     <Dialog open={open} onClose={onClose} title="Punti Ferita" width={440}>
       <div className={styles.body} style={{ '--tone': 'var(--c-hp)' } as CSSProperties}>
-        <div className={styles.big}>
+        <div key={flash?.n ?? 0} className={`${styles.big} ${flashClass}`}>
           <HpIcon aria-hidden className={styles.bigIcon} />
-          <strong className={hp <= 0 ? styles.down : undefined}>{fmt(hp)}</strong>
+          <strong className={hp <= 0 ? styles.down : undefined}>
+            <NumberField label="Punti ferita" value={hp} onCommit={(v) => v !== null && onSetHp(v)} />
+          </strong>
           <small>/ {fmt(max)}</small>
           {sheet.temp_hp > 0 && <span className={styles.temp}>+{fmt(sheet.temp_hp)}</span>}
         </div>

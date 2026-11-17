@@ -64,7 +64,8 @@ La scheda è **sempre modificabile**, come una scheda di carta con la matita in 
 
 ### Parametri vitali
 - Tocco su PF, risorsa, oro o barra del livello → finestra con il valore grande e un campo **quantità** con due pulsanti grandi: **Danno / Cura** per i PF, **Togli / Aggiungi** per il resto. Invio = pulsante di destra. Il numero grande resta modificabile direttamente.
-- PF: i danni consumano prima i temporanei; nella finestra si correggono anche danni, temporanei e bonus.
+- PF: i danni consumano prima i temporanei; nella finestra si correggono anche danni, temporanei e bonus. I PF scritti a mano nel numero grande valgono come danno o cura della differenza (stesse regole, stesso avviso con Annulla).
+- Danno e cura fanno lampeggiare il numero dei PF (scossa rossa per il danno, battito verde per la cura) sia nell'intestazione sia nella finestra.
 - Livello: −/+ nella finestra dell'esperienza.
 - **Annulla al posto delle conferme**: ogni cambio mostra un avviso in basso (es. "PF 154 → 147") con **Annulla** per 5 secondi.
 
