@@ -16,6 +16,13 @@ export function useRoll() {
   return useContext(RollContext)
 }
 
+/** false sulla scheda di un altro (il Master non tira per i giocatori). */
+export const CanRollContext = createContext(true)
+
+export function useCanRoll() {
+  return useContext(CanRollContext)
+}
+
 const LONG_PRESS_MS = 450
 
 /**
@@ -24,6 +31,7 @@ const LONG_PRESS_MS = 450
  */
 export function useRollTrigger(target: RollTarget | null) {
   const roll = useRoll()
+  const canRoll = useCanRoll()
   const timer = useRef<number | null>(null)
   const longPressed = useRef(false)
 
@@ -32,7 +40,7 @@ export function useRollTrigger(target: RollTarget | null) {
     timer.current = null
   }
 
-  if (!target) return {}
+  if (!target || !canRoll) return {}
 
   return {
     onClick: (event: MouseEvent) => {

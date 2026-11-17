@@ -4,17 +4,22 @@ import { FreeRoller } from '../../../dice/DiceRoller'
 import { OUTCOME_LABELS, useCampaignFeed, useCharacterRolls, type DiceRoll, type FeedRoll, type RollOutcome } from '../../../dice/api'
 import { formatDateTime } from '../../../../lib/format'
 import type { CharacterSheet } from '../../api'
+import { useCanRoll } from '../sheetContext'
 import styles from './DiceTab.module.less'
 
 export function DiceTab({ sheet }: { sheet: CharacterSheet }) {
+  const canRoll = useCanRoll()
+
   return (
     <div className={styles.layout}>
-      <div className={styles.column}>
-        <section className="card">
-          <h2 className={styles.title}>Tiro libero</h2>
-          <FreeRoller sheet={sheet} />
-        </section>
-      </div>
+      {canRoll && (
+        <div className={styles.column}>
+          <section className="card">
+            <h2 className={styles.title}>Tiro libero</h2>
+            <FreeRoller sheet={sheet} />
+          </section>
+        </div>
+      )}
 
       <section className="card">
         <h2 className={styles.title}>Tiri di {sheet.name}</h2>

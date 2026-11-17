@@ -20,7 +20,7 @@ import {
 } from '../../api'
 import { AskMasterButton } from '../../../threads/AskMasterButton'
 import { skillDisplayName } from '../sheetHelpers'
-import { useRollTrigger } from '../sheetContext'
+import { useCanRoll, useRollTrigger } from '../sheetContext'
 import { NoRoll, ProgressLine } from '../SheetBits'
 import { ThreadDot } from '../ThreadDot'
 import { AddSkillDialog } from './AddSkillDialog'
@@ -203,6 +203,7 @@ function SkillItem({ sheet, skill, showAttribute = false }: ItemProps) {
   const description = skill.description || definition?.description || ''
   const nextCost = skillNextCost(skill.level, skill.is_maxed)
   const trigger = useRollTrigger({ label: name, attribute: skill.attribute, level: skill.level, isMaxed: skill.is_maxed })
+  const canRoll = useCanRoll()
 
 
   const Chevron = expanded ? CollapseIcon : ExpandIcon
@@ -227,7 +228,11 @@ function SkillItem({ sheet, skill, showAttribute = false }: ItemProps) {
     <li className={`${styles.item} ${skill.is_maxed ? styles.maxed : ''} ${expanded ? styles.itemOpen : ''}`}>
       <div className={styles.row}>
         {/* Gerarchia: nome e livello in evidenza; avanzamento sottile sotto il nome; dado solo al passaggio */}
-        <div className={`${styles.cells} ${styles.playCells} ${styles.rollable}`} role="button" tabIndex={0} aria-label={`Tira ${name}`} {...trigger}>
+        <div
+          className={`${styles.cells} ${styles.playCells} ${canRoll ? styles.rollable : ''}`}
+          {...(canRoll && { role: 'button', tabIndex: 0, 'aria-label': `Tira ${name}` })}
+          {...trigger}
+        >
           <span className={styles.main}>
             {nameBlock}
             {/* Al MAX la scritta prende il posto della barra */}
@@ -242,7 +247,7 @@ function SkillItem({ sheet, skill, showAttribute = false }: ItemProps) {
               />
             )}
           </span>
-          <DiceIcon aria-hidden className={styles.dice} />
+          <DiceIcon aria-hidden className={canRoll ? styles.dice : `${styles.dice} ${styles.diceIdle}`} />
           {/* "Liv" sopra, il numero sotto: clic sul numero per modificarlo */}
           <span className={styles.levelPair}>
             <small>Liv</small>

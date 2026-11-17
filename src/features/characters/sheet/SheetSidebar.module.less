@@ -24,16 +24,23 @@
   gap: @space-2;
   padding: 9px 4px 9px @space-2;
   border-radius: @radius-sm;
-  .rollable();
 
   & + & {
     border-top: 1px solid color-mix(in srgb, var(--frame-soft) 55%, transparent);
   }
 
-  // Dado e domanda compaiono solo passando sopra la riga
-  &:hover .dice,
-  &:focus-visible .dice,
+  // La domanda compare solo passando sopra la riga
   &:hover .ask {
+    opacity: 1;
+  }
+}
+
+// Riga tirabile (solo sui propri personaggi): il dado compare al passaggio
+.rollable {
+  .rollable();
+
+  &:hover .dice,
+  &:focus-visible .dice {
     opacity: 1;
   }
 }

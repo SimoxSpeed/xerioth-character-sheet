@@ -28,7 +28,7 @@ import { JournalTab } from './journal/JournalTab'
 import { QuestionsTab } from './questions/QuestionsTab'
 import { DiceTab } from './dice/DiceTab'
 import { TrainingTab } from './training/TrainingTab'
-import { RollContext, type RollRequest } from './sheetContext'
+import { CanRollContext, RollContext, type RollRequest } from './sheetContext'
 import styles from './CharacterSheetPage.module.less'
 
 type TabKey = 'capacita' | 'poteri' | 'inventario' | 'diario' | 'allenamenti' | 'domande' | 'tiri'
@@ -99,6 +99,8 @@ function Sheet({ sheet }: { sheet: CharacterSheet }) {
   const otherBadge = otherTabs.reduce((n, t) => n + (t.badge ?? 0), 0)
 
   return (
+    // Si tira solo sui propri personaggi: il Master non tira per i giocatori
+    <CanRollContext.Provider value={isOwner}>
     <RollContext.Provider value={roll}>
         <div className={styles.sheet}>
           {isMaster && !isOwner && <p className={styles.masterNote}>Vista Master</p>}
@@ -180,18 +182,22 @@ function Sheet({ sheet }: { sheet: CharacterSheet }) {
           </div>
 
           {/* Dado per i tiri liberi (desktop) */}
-          <button type="button" className={styles.fab} onClick={() => roll({ immediate: false })} aria-label="Tiro libero" title="Tiro libero">
-            <DiceIcon aria-hidden />
-          </button>
+          {isOwner && (
+            <button type="button" className={styles.fab} onClick={() => roll({ immediate: false })} aria-label="Tiro libero" title="Tiro libero">
+              <DiceIcon aria-hidden />
+            </button>
+          )}
 
           {/* Barra in basso (telefono), con il dado al centro */}
-          <nav className={styles.bottomNav} data-bottom-nav aria-label="Sezioni della scheda">
+          <nav className={isOwner ? styles.bottomNav : `${styles.bottomNav} ${styles.bottomNavNoDice}`} data-bottom-nav aria-label="Sezioni della scheda">
             {mobileTabs.slice(0, 2).map((t) => (
               <NavButton key={t.key} tab={t} active={tab === t.key} onClick={() => go(t.key)} />
             ))}
-            <button type="button" className={styles.navDice} onClick={() => roll({ immediate: false })} aria-label="Tiro libero">
-              <DiceIcon aria-hidden />
-            </button>
+            {isOwner && (
+              <button type="button" className={styles.navDice} onClick={() => roll({ immediate: false })} aria-label="Tiro libero">
+                <DiceIcon aria-hidden />
+              </button>
+            )}
             {mobileTabs.slice(2).map((t) => (
               <NavButton key={t.key} tab={t} active={tab === t.key} onClick={() => go(t.key)} />
             ))}
@@ -229,6 +235,7 @@ function Sheet({ sheet }: { sheet: CharacterSheet }) {
           </Dialog>
         </div>
     </RollContext.Provider>
+    </CanRollContext.Provider>
   )
 }
 

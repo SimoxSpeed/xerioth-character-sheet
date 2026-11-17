@@ -11,7 +11,7 @@ import { AddIcon, CollapseIcon, DeleteIcon, DiceIcon, EditIcon, ExpandIcon, Quic
 import { useIsMaster } from '../../../campaigns/api'
 import { skillLevel, useDeletePower, useUpdatePower, type CharacterSheet, type PowerRow } from '../../api'
 import { AskMasterButton } from '../../../threads/AskMasterButton'
-import { useRollTrigger } from '../sheetContext'
+import { useCanRoll, useRollTrigger } from '../sheetContext'
 import { NoRoll, ProgressLine } from '../SheetBits'
 import { ThreadDot } from '../ThreadDot'
 import { PowerDialog } from './PowerDialog'
@@ -135,7 +135,8 @@ function PowerCard({ sheet, power, section, quickPct, onEdit }: CardProps) {
           power: { successTarget: power.success_target },
         },
   )
-  const rollable = power.level !== null
+  const canRoll = useCanRoll()
+  const rollable = power.level !== null && canRoll
 
   // Raggio, area, durata: sempre a vista nel blocco Effetto ("—" se vuoti).
   // Raggio e area uguali: un valore solo che occupa entrambe le colonne.

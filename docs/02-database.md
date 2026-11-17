@@ -267,6 +267,8 @@ Notifiche: badge con il numero di domande in attesa e aggiornamento in tempo rea
 
 ### 2.4 Tiri di dado
 
+> ✅ Si tira **solo sui propri personaggi** (`20261117211147_roll_own_characters_only.sql`): la policy `dice_rolls_insert` usa `is_character_owner` al posto di `can_access_character`, quindi il Master non può tirare sulle schede dei giocatori; i tiri esistenti restano visibili come prima.
+
 > ✅ **Applicata** il 15/11/2026 (`supabase/migrations/20261115190311_dice_roll_feed.sql`), riscritta senza DROP/DELETE: i tiri nascosti restano nel feed con `hidden = true` e la regola di lettura li esclude.
 
 Il gruppo vede di ogni tiro **solo il totale e l'esito** (successo / fallimento / critico negativo). Per questo ci sono due tabelle:
@@ -299,7 +301,7 @@ L'uso dei Punti Fato **non** si registra.
 | Chi | Può |
 |---|---|
 | **Giocatore** | leggere e modificare **solo i propri** personaggi (e tabelle figlie); vedere i tiri pubblici della propria campagna |
-| **Master** (della campagna) | leggere e modificare **tutti** i personaggi della campagna; rispondere alle domande |
+| **Master** (della campagna) | leggere e modificare **tutti** i personaggi della campagna, ma **non tirare** sui personaggi altrui; rispondere alle domande |
 | **Nessuno** dall'app | cambiare ruoli o appartenenza alle campagne |
 
 - Le voci di diario `private` le vede solo l'autore, quindi neanche il Master.

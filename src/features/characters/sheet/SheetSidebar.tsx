@@ -6,7 +6,7 @@ import { NumberField } from '../../../components/NumberField'
 import { ArmorIcon, DiceIcon, InventoryIcon, WeaponIcon } from '../../../components/icons'
 import { attributeValues, useUpdateAttribute, type CharacterSheet } from '../api'
 import { AskMasterButton } from '../../threads/AskMasterButton'
-import { useRollTrigger } from './sheetContext'
+import { useCanRoll, useRollTrigger } from './sheetContext'
 import { NoRoll, ProgressLine } from './SheetBits'
 import { ThreadDot } from './ThreadDot'
 import styles from './SheetSidebar.module.less'
@@ -45,13 +45,12 @@ function AttributeRow({ sheet, attribute }: { sheet: CharacterSheet; attribute: 
   const nextCost = attributeNextCost(attribute, value)
   const def = ATTRIBUTES[attribute]
   const trigger = useRollTrigger({ label: def.label, attribute, level: null, attributeOnly: true })
+  const canRoll = useCanRoll()
 
   return (
     <div
-      className={styles.attribute}
-      role="button"
-      tabIndex={0}
-      aria-label={`Tira ${def.label}`}
+      className={canRoll ? `${styles.attribute} ${styles.rollable}` : styles.attribute}
+      {...(canRoll && { role: 'button', tabIndex: 0, 'aria-label': `Tira ${def.label}` })}
       {...trigger}
     >
       {/* Gerarchia: nome, valore e modificatore in evidenza; avanzamento sottile sotto il nome */}

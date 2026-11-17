@@ -291,6 +291,13 @@
   }
 }
 
+// Scheda di un altro: niente dado al centro
+.bottom-nav-no-dice {
+  @media @bp-mobile {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
 @media @bp-mobile {
   :global(html:has([data-bottom-nav])) {
     --bottom-nav-h: 62px;

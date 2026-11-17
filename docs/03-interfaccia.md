@@ -53,6 +53,7 @@ La scheda occupa **tutta la pagina**, senza link "indietro" (si torna con il log
 ### Sempre modificabile (niente modalità Modifica)
 La scheda è **sempre modificabile**, come una scheda di carta con la matita in mano. Non esiste un pulsante "Modifica".
 - **Tiro**: un tocco su una caratteristica, capacità o potere **tira subito** il d20. **Pressione lunga** (o clic destro, o Maiusc+Invio) apre le opzioni prima del tiro: dado fisico, tiro nascosto.
+- **Solo sui propri personaggi**: sulla scheda di un giocatore il Master **non tira**. Le righe non sono tirabili (niente icona del dado, niente evidenziazione al passaggio), il dado flottante non c'è e la linguetta Tiri mostra solo lo storico. Il clic sui numeri per modificarli resta.
 - **Numeri** (valore della caratteristica, livello, riuscita per il Master, aspetto): un clic sul numero lo modifica (bordo tratteggiato al passaggio); il clic sul resto della riga, barra di avanzamento compresa, tira.
 - **Campo in modifica**: grande quanto il numero, stesso carattere; niente riquadro, solo una **sottolineatura "a matita"** e un velo di colore. Lo stesso vale per il campo "quanti punti", compatto e in riga (− + ✕ senza bordi).
 - **Avanzamento**: un clic sui punti ("7 / 100") apre il campo per aggiungere o togliere punti.
