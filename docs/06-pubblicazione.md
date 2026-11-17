@@ -19,7 +19,7 @@ Progetto Supabase: `rratuwwmqgvkvyvvpqiy` → `https://rratuwwmqgvkvyvvpqiy.supa
 
 ### Branch
 
-- `main` = **produzione** (`https://xerioth-character-sheet.pages.dev`): quando una versione è pronta, merge di `dev` e poi `.\scripts\release.cmd patch|minor|major` (versione, tag, push; vedi CLAUDE.md, "Release");
+- `main` = **produzione** (`https://xerioth-character-sheet.pages.dev`): quando una versione è pronta, merge di `dev` in `main` e push: Cloudflare ricostruisce e pubblica il sito da solo;
 - `dev` e gli altri branch = **anteprime** (`https://<branch>.xerioth-character-sheet.pages.dev`).
 
 ### Configurazione *(tu, dalla dashboard Cloudflare)*

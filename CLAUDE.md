@@ -13,7 +13,10 @@ Prima di dichiarare finito un lavoro su `.ts`/`.tsx`: `npm run typecheck`; se ha
 
 ## Stack
 
-React 19, TypeScript strict (`noUncheckedIndexedAccess`, `verbatimModuleSyntax`), Vite, React Router, TanStack Query, `@supabase/supabase-js`, LESS con CSS Modules, lucide-react (versione fissata a 1.66.0).
+- **Frontend:** React 19, TypeScript strict (`noUncheckedIndexedAccess`, `verbatimModuleSyntax`), Vite, React Router, TanStack Query, LESS con CSS Modules, lucide-react (versione fissata a 1.66.0), Vitest.
+- **Backend:** Supabase (progetto `rratuwwmqgvkvyvvpqiy`, Francoforte) via `@supabase/supabase-js`: Postgres con RLS, Auth (email e password, Google con flusso PKCE), Realtime per il registro dei tiri.
+- **Hosting:** Cloudflare Pages, progetto `xerioth-character-sheet` → `https://xerioth-character-sheet.pages.dev`. Sito statico (`dist/`), Node 22 da `.node-version`, variabili `VITE_*` impostate su Cloudflare.
+- **GitHub Actions:** `keep-supabase-awake.yml` interroga il database il lunedì e il giovedì (il piano Free di Supabase va in pausa dopo 7 giorni senza attività).
 
 ## Struttura
 
@@ -41,21 +44,17 @@ React 19, TypeScript strict (`noUncheckedIndexedAccess`, `verbatimModuleSyntax`)
 
 ## Git
 
-- Si lavora su `dev`; `main` è il branch di rilascio e Cloudflare Pages pubblica ogni suo push. Le release partono da `main` dopo un merge di `dev`.
+- Si lavora su `dev`; `main` è la produzione (vedi "Pubblicare").
 - Messaggi di commit: una sola riga, Conventional Commits con gitmoji, in inglese, all'imperativo e in minuscolo, senza scope, body o trailer (niente `Co-Authored-By`). Brevi e diretti: cosa cambia, non perché né come. Esempi: `feat: ✨ add google sign-in`, `fix: 🐛 display sign-in errors`, `ci: 👷 keep supabase project awake`.
 - Le modifiche a questo file e a `docs/` vanno nel commit che implementa ciò che descrivono: niente commit `docs` separati, niente fixup del commit che le ha introdotte.
 - Commit, push e riscritture della history solo su richiesta.
-- Il commit di release (`chore(release): 🚀 release X.Y.Z`, unica eccezione alla regola senza scope) lo crea solo `scripts/release.ps1`, mai a mano.
 
-## Release
+## Pubblicare
 
-- **Versione:** unica fonte `version` in `package.json` (e `package-lock.json`). La incrementa solo lo script.
-- **Pubblicare** (Windows, da `main` dopo il merge di `dev`): `.\scripts\release.cmd patch|minor|major`. Lo lancia chi fa la release, non Claude. Richiede GitHub CLI autenticata con permesso di push (`gh auth login`).
-  1. Controlla branch pulito e allineato a origin, `dev` già unito, tag libero; poi apre il Blocco note per le note di rilascio. **Le note sono per i giocatori**, anche quando le scrive Claude: cosa cambia per loro, in italiano, testo semplice con trattini; niente dettagli di sviluppo (script, test, migrazioni, refactoring, nomi di file).
-  2. Incrementa la versione (`npm version --no-git-tag-version`).
-  3. Lancia `npm test` e `npm run build`.
-  4. Dopo conferma: commit, tag annotato `vX.Y.Z` e push atomico di `main` e tag. Cloudflare Pages pubblica il sito.
-  5. Con `gh release create` crea la release su GitHub con le note.
-  6. Porta `dev` (locale e origin) al commit di release, se è un avanzamento semplice.
-  Se fallisce prima del commit, rimette `package.json` e `package-lock.json` com'erano.
-- Gli script stanno in `scripts/` come `.ps1` salvati in UTF-8 **con BOM** (PowerShell 5.1 senza BOM legge male le lettere accentate), con accanto un `.cmd` che li lancia senza toccare la ExecutionPolicy. La radice del repo per lo script è `Split-Path -Parent $PSScriptRoot`; uno script che fallisce esce con `exit 1`.
+Pubblicare significa mettere online la versione nuova del sito su `https://xerioth-character-sheet.pages.dev`.
+
+- Il sito è sempre quello che c'è su `main`: a ogni push su `main` Cloudflare Pages scarica il codice da GitHub, lancia `npm run build` e sostituisce il sito in 1–2 minuti. Su Cloudflare non si fa niente.
+- Un push su `dev` non cambia il sito: crea solo un'anteprima su `https://dev.xerioth-character-sheet.pages.dev`.
+- Come si pubblica: `npm run typecheck` e `npm test`, poi `git checkout main`, `git merge dev`, `git push`, `git checkout dev`.
+- Il database non si pubblica: le migrazioni sono già applicate via MCP quando si scrivono. Al push su `main` il check "Supabase Preview" verifica solo che i file delle migrazioni corrispondano al database.
+- Se cambiano le variabili `VITE_*` su Cloudflare, servono un nuovo deploy (*Deployments → ⋯ → Retry deployment*) o un nuovo push su `main`.
