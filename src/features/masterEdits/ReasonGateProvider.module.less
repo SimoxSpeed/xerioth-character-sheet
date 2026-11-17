@@ -1,0 +1,58 @@
+@import '../../styles/tokens.less';
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: @space-3;
+}
+
+.changes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: @space-3;
+    border-left: 3px solid var(--accent);
+  }
+}
+
+.what {
+  font-size: 14px;
+}
+
+.change {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: @space-2;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+
+  :global(.lucide) {
+    color: var(--text-muted);
+  }
+}
+
+.before {
+  color: var(--text-soft);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.after {
+  color: var(--accent);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: @space-2;
+}

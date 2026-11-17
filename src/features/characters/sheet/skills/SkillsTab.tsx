@@ -23,6 +23,7 @@ import { skillDisplayName } from '../sheetHelpers'
 import { useCanRoll, useRollTrigger } from '../sheetContext'
 import { NoRoll, ProgressLine } from '../SheetBits'
 import { ThreadDot } from '../ThreadDot'
+import { EditMark } from '../EditMark'
 import { AddSkillDialog } from './AddSkillDialog'
 import styles from './SkillsTab.module.less'
 
@@ -221,6 +222,7 @@ function SkillItem({ sheet, skill, showAttribute = false }: ItemProps) {
         </span>
       )}
       <ThreadDot characterId={sheet.id} targetType="skill" targetId={skill.id} />
+      <EditMark characterId={sheet.id} filters={[{ type: 'skill', id: skill.id }]} />
     </span>
   )
 

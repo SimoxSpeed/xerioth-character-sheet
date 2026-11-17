@@ -16,6 +16,13 @@ export function useRoll() {
   return useContext(RollContext)
 }
 
+/** true se chi guarda è il proprietario della scheda (vede i segni delle modifiche del Master). */
+export const IsOwnerContext = createContext(true)
+
+export function useIsOwner() {
+  return useContext(IsOwnerContext)
+}
+
 /** false sulla scheda di un altro (il Master non tira per i giocatori). */
 export const CanRollContext = createContext(true)
 

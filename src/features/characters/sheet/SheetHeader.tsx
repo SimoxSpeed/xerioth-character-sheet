@@ -32,10 +32,19 @@ import {
 } from '../api'
 import { classesLabel, raceLabel } from '../labels'
 import { CounterDialog, HpDialog, XpDialog, type HpFlash } from './VitalDialogs'
+import { EditMark } from './EditMark'
+import { HP_FIELDS, VITAL_FIELDS, type EditFilter } from '../../masterEdits/api'
 import styles from './SheetHeader.module.less'
 import flashStyles from './HpFlash.module.less'
 
 type Editor = 'hp' | 'xp' | 'madness' | 'fate' | 'gold' | { resource: string } | null
+
+// Dove compare il segno delle modifiche del Master nell'intestazione
+const IDENTITY_EDITS: EditFilter[] = [{ type: 'character', exceptFields: VITAL_FIELDS }, { type: 'class' }]
+const LEVEL_EDITS: EditFilter[] = [{ type: 'character', fields: ['level'] }, { type: 'xp' }]
+const HP_EDITS: EditFilter[] = [{ type: 'character', fields: HP_FIELDS }]
+const fieldEdits = (field: string): EditFilter[] => [{ type: 'character', fields: [field] }]
+const resourceEdits = (key: string): EditFilter[] => [{ type: 'resource', id: key }]
 
 const fmt = (n: number) => n.toLocaleString('it-IT')
 const tone = (color: string) => ({ '--tone': color }) as CSSProperties
@@ -183,6 +192,7 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
         <LevelIcon aria-hidden />
         <small>Liv.</small>
         <strong>{sheet.level}</strong>
+        <EditMark characterId={sheet.id} filters={LEVEL_EDITS} />
       </span>
       <span className={styles.xpTrack}>
         <ProgressBar label="Esperienza del livello" value={xp.inLevel} max={xp.nextLevelCost} tone="xp" />
@@ -207,6 +217,7 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
           <div className={styles.identity}>
             <div className={styles.nameRow}>
               <h1 className={styles.name}>{sheet.name}</h1>
+              <EditMark characterId={sheet.id} filters={IDENTITY_EDITS} />
             </div>
             {lineage}
             {looks}
@@ -218,6 +229,7 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
           <button type="button" className={`${styles.tile} ${styles.hpTile}`} style={tone('var(--c-hp)')} onClick={() => setEditor('hp')}>
             <span className={styles.tileLabel}>
               <HpIcon aria-hidden /> Punti Ferita
+              <EditMark characterId={sheet.id} filters={HP_EDITS} />
             </span>
             <span key={hpFlash?.n ?? 0} className={`${styles.hpValue} ${flashClass}`}>
               <strong className={hp <= 0 ? styles.down : undefined}>{fmt(hp)}</strong>
@@ -242,6 +254,7 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
             <button key={r.key} type="button" className={styles.tile} style={tone(r.color)} onClick={() => setEditor({ resource: r.key })}>
               <span className={styles.tileLabel}>
                 <r.icon aria-hidden /> {r.short}
+                <EditMark characterId={sheet.id} filters={resourceEdits(r.key)} />
               </span>
               <span className={styles.tileValue}>
                 <strong>{fmt(r.current)}</strong>
@@ -251,12 +264,29 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
             </button>
           ))}
 
-          <CounterTile label="Follia" icon={MadnessIcon} color="var(--c-madness)" value={sheet.madness_points} onOpen={() => setEditor('madness')} onChange={setMadness} />
-          <CounterTile label="Fato" icon={FateIcon} color="var(--c-fate)" value={sheet.fate_points} onOpen={() => setEditor('fate')} onChange={setFate} />
+          <CounterTile
+            label="Follia"
+            icon={MadnessIcon}
+            color="var(--c-madness)"
+            value={sheet.madness_points}
+            onOpen={() => setEditor('madness')}
+            onChange={setMadness}
+            mark={<EditMark characterId={sheet.id} filters={fieldEdits('madness_points')} />}
+          />
+          <CounterTile
+            label="Fato"
+            icon={FateIcon}
+            color="var(--c-fate)"
+            value={sheet.fate_points}
+            onOpen={() => setEditor('fate')}
+            onChange={setFate}
+            mark={<EditMark characterId={sheet.id} filters={fieldEdits('fate_points')} />}
+          />
 
           <button type="button" className={styles.tile} style={tone('var(--c-gold)')} onClick={() => setEditor('gold')}>
             <span className={styles.tileLabel}>
               <GoldIcon aria-hidden /> Oro
+              <EditMark characterId={sheet.id} filters={fieldEdits('gold')} />
             </span>
             <span className={styles.tileValue}>
               <strong>{fmt(sheet.gold)}</strong>
@@ -271,9 +301,13 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
           <button type="button" className={styles.bandId} onClick={() => setDetails((v) => !v)} aria-expanded={details}>
             {portrait(styles.bandPortrait)}
             <span className={styles.bandText}>
-              <span className={styles.bandName}>{sheet.name}</span>
+              <span className={styles.bandName}>
+                {sheet.name}
+                <EditMark characterId={sheet.id} filters={IDENTITY_EDITS} />
+              </span>
               <span className={styles.bandLevel}>
                 <LevelIcon aria-hidden /> {sheet.level}
+                <EditMark characterId={sheet.id} filters={LEVEL_EDITS} />
                 <span className={styles.bandXp}>
                   <ProgressBar label="Esperienza del livello" value={xp.inLevel} max={xp.nextLevelCost} tone="xp" />
                 </span>
@@ -290,6 +324,7 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
             <strong className={hp <= 0 ? styles.down : undefined}>{fmt(hp)}</strong>
             <small>/ {fmt(hpMax ?? 0)}</small>
             {sheet.temp_hp > 0 && <span className={styles.temp}>+{fmt(sheet.temp_hp)}</span>}
+            <EditMark characterId={sheet.id} filters={HP_EDITS} />
           </span>
           <span className={styles.bandHpBar}>
             <ProgressBar label="Punti ferita" value={Math.max(0, hp)} max={(hpMax ?? 0) + sheet.temp_hp} tone="hp" />
@@ -300,16 +335,20 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
           {resources.map((r) => (
             <Chip key={r.key} icon={r.icon} color={r.color} label={r.label} onClick={() => setEditor({ resource: r.key })}>
               {fmt(r.current)}
+              <EditMark characterId={sheet.id} filters={resourceEdits(r.key)} />
             </Chip>
           ))}
           <Chip icon={MadnessIcon} color="var(--c-madness)" label="Follia" onClick={() => setEditor('madness')}>
             {sheet.madness_points}
+            <EditMark characterId={sheet.id} filters={fieldEdits('madness_points')} />
           </Chip>
           <Chip icon={FateIcon} color="var(--c-fate)" label="Fato" onClick={() => setEditor('fate')}>
             {sheet.fate_points}
+            <EditMark characterId={sheet.id} filters={fieldEdits('fate_points')} />
           </Chip>
           <Chip icon={GoldIcon} color="var(--c-gold)" label="Monete d’oro" onClick={() => setEditor('gold')}>
             {fmt(sheet.gold)}
+            <EditMark characterId={sheet.id} filters={fieldEdits('gold')} />
           </Chip>
         </div>
 
@@ -409,6 +448,7 @@ function CounterTile({
   value,
   onOpen,
   onChange,
+  mark,
 }: {
   label: string
   icon: LucideIcon
@@ -416,12 +456,15 @@ function CounterTile({
   value: number
   onOpen: () => void
   onChange: (value: number) => void
+  /** Segno delle modifiche del Master. */
+  mark?: ReactNode
 }) {
   return (
     <div className={`${styles.tile} ${styles.counterTile}`} style={tone(color)}>
       <button type="button" className={styles.tileOpen} onClick={onOpen}>
         <span className={styles.tileLabel}>
           <Icon aria-hidden /> {label}
+          {mark}
         </span>
         <span className={styles.tileValue}>
           <strong>{value}</strong>

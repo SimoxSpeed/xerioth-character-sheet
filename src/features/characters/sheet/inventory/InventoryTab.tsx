@@ -17,6 +17,7 @@ import { useDeleteItem, useUpdateItem, type CharacterSheet, type ItemRow } from 
 import { AskMasterButton } from '../../../threads/AskMasterButton'
 import { SLOT_LABELS } from '../sheetHelpers'
 import { ThreadDot } from '../ThreadDot'
+import { EditMark } from '../EditMark'
 import { ItemDialog } from './ItemDialog'
 import styles from './InventoryTab.module.less'
 
@@ -144,6 +145,7 @@ function ItemRowView({ sheet, item, onEdit }: { sheet: CharacterSheet; item: Ite
             <span className={styles.name}>
               {item.name}
               <ThreadDot characterId={sheet.id} targetType="item" targetId={item.id} />
+              <EditMark characterId={sheet.id} filters={[{ type: 'item', id: item.id }]} />
             </span>
             {item.slot && <span className={styles.slot}>{SLOT_LABELS[item.slot]}</span>}
           </span>

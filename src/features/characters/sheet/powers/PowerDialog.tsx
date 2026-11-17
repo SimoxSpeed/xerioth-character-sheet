@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { forcedSuccessDie, powerSuccessTarget, rollBonus, type PowerSection } from '../../../../game/rules'
 import { Dialog } from '../../../../components/Dialog'
 import { attributeValues, useAddPower, useUpdatePower, type CharacterSheet, type PowerRow } from '../../api'
+import { saved, visibleError } from '../../../masterEdits/gate'
 import styles from './PowerDialog.module.less'
 
 interface Props {
@@ -66,7 +67,7 @@ function PowerForm({
   const [description, setDescription] = useState(power?.description ?? '')
 
   const pending = add.isPending || update.isPending
-  const error = add.error ?? update.error
+  const error = visibleError(add.error ?? update.error)
 
   // Riuscita: il Master sceglie il dado e si salva il totale di questo momento
   // (dado + caratteristica + modificatore + livello). Livello 0 = sempre dado 20.
@@ -98,9 +99,8 @@ function PowerForm({
       // la riuscita già fissata non si ricalcola.
       ...(isMaster && dieChanged ? { success_die: chosenDie, success_target: newTarget } : {}),
     }
-    if (power) await update.mutateAsync({ id: power.id, patch: fields })
-    else await add.mutateAsync(fields)
-    onDone()
+    const done = await saved(power ? update.mutateAsync({ id: power.id, patch: fields }) : add.mutateAsync(fields))
+    if (done) onDone()
   }
 
   return (

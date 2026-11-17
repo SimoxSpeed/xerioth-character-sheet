@@ -26,7 +26,11 @@ export function TextField({ value, onCommit, label, placeholder = '—', disable
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') commit()
+    // preventDefault: l'Invio non deve "premere" ciò che riceve il focus subito dopo
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      commit()
+    }
     if (event.key === 'Escape') setEditing(false)
   }
 

@@ -18,7 +18,11 @@ export function Dialog({ open, onClose, title, children, width = 720 }: DialogPr
   useEffect(() => {
     const dialog = ref.current
     if (!dialog) return
-    if (open && !dialog.open) dialog.showModal()
+    if (open && !dialog.open) {
+      dialog.showModal()
+      // showModal mette il focus sul primo pulsante (la ✕): chi vuole un campo usa data-autofocus
+      dialog.querySelector<HTMLElement>('[data-autofocus]')?.focus()
+    }
     if (!open && dialog.open) dialog.close()
   }, [open])
 

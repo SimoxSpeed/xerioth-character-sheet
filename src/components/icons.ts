@@ -3,6 +3,7 @@
 export {
   ArrowLeft as BackIcon,
   ArrowRight as ForwardIcon,
+  Asterisk as EditMarkIcon,
   Award as LevelIcon,
   Backpack as InventoryIcon,
   BookOpen as StoryIcon,

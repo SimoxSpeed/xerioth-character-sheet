@@ -9,6 +9,7 @@ import { AskMasterButton } from '../../threads/AskMasterButton'
 import { useCanRoll, useRollTrigger } from './sheetContext'
 import { NoRoll, ProgressLine } from './SheetBits'
 import { ThreadDot } from './ThreadDot'
+import { EditMark } from './EditMark'
 import styles from './SheetSidebar.module.less'
 
 export function Box({ title, children, className }: { title: string; children: ReactNode; className?: string }) {
@@ -58,6 +59,7 @@ function AttributeRow({ sheet, attribute }: { sheet: CharacterSheet; attribute: 
         <span className={styles.attributeName}>
           {def.label}
           <ThreadDot characterId={sheet.id} targetType="attribute" targetId={attribute} />
+          <EditMark characterId={sheet.id} filters={[{ type: 'attribute', id: attribute }]} />
         </span>
         <ProgressLine
           name={def.label}

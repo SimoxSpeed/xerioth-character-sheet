@@ -9,7 +9,7 @@ Sostituire le schede personaggio su Google Sheets del gioco di ruolo **Xerioth**
 - la **scheda personaggio** prima di tutto: dati, caratteristiche, capacità, poteri, inventario, diario;
 - **template di classe**: il sistema è quasi lo stesso per tutti i personaggi, ma la classe decide cosa compare (miracoli, incantesimi, poteri mentali…) e quale risorsa si usa (Spirito, Mana, Mente, Anima…). I template vivono nel codice, insieme alle eventuali tabelle di conversione per calcolare i costi dei poteri;
 - **calcoli automatici solo dove esiste una formula certa** (modificatori, PF, costi di avanzamento, Mana, stima dell'allenamento, totale dei tiri). Ciò che decide il Master resta un campo da compilare. Le nuove formule si aggiungono caso per caso;
-- il **Master** (per campagna) vede tutte le schede della sua campagna e risponde alle **domande** dei giocatori;
+- il **Master** (per campagna) vede tutte le schede della sua campagna e risponde alle **domande** dei giocatori. Può modificare le schede dei giocatori, ma **non tirarci**: ogni sua modifica viene segnalata al giocatore e registrata nello storico "Modifiche del Master", con la motivazione facoltativa;
 - in una fase successiva, **pagine informative a moduli** per il materiale del Master (testo, tabelle, immagini, date a calendario).
 
 ## Documenti

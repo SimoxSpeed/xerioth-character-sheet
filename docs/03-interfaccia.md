@@ -173,6 +173,25 @@ Ogni tiro va nel registro della campagna, visibile al gruppo secondo le regole d
 - L'icona domanda sta nel dettaglio di ogni elemento (freccia a destra); per le caratteristiche è in fondo alla riga, tenue, piena al passaggio. Se una domanda è aperta o ha una risposta, accanto al nome compare l'icona colorata (azzurra in attesa, verde con risposta). Il giocatore scrive la domanda; se ce n'è già una aperta, si apre la conversazione.
 - Il Master vede una **lista di domande in attesa**. Un clic porta alla scheda, con l'elemento evidenziato.
 - Stati: *in attesa del Master* → *risposta ricevuta* → *chiusa* (la chiude il giocatore).
+- **Linguetta Domande**, filtri: Aperte, In attesa, Con risposta, Chiuse, **Modifiche del Master**. Il Master che apre la scheda di un giocatore usa la stessa linguetta: risponde subito alle domande e consulta lo storico delle modifiche.
+
+---
+
+## Modifiche del Master
+
+Il Master modifica la scheda di un giocatore come il giocatore stesso (clic sui numeri, dettagli, finestre di modifica). In più:
+
+- **Motivazione a ogni modifica**: prima di salvare compare una piccola finestra che mostra **cosa cambia** (elemento · campo, valore prima barrato → valore dopo; "Aggiunto" / "Eliminato" per elementi interi; per l'esperienza il totale prima → dopo), poi il campo **Motivazione** (facoltativo) e i pulsanti Salva / Annulla (Ctrl+Invio salva). Vale per ogni salvataggio, compresi danni e cure ai PF, risorse, cariche e "Usa". Se nessun valore cambia davvero, la finestra non compare.
+- **Modifiche ripetute**: se il Master cambia di nuovo un valore il cui segno il giocatore non ha ancora tolto, **si aggiorna la modifica già presente** (prima = valore di partenza, dopo = ultimo valore). Il campo Motivazione si apre già compilato con la motivazione precedente, da tenere o cambiare.
+- **Segno per il giocatore**: **asterisco bordeaux** grande (`--c-edit`, più chiaro nel tema scuro), come una nota a margine: attenzione, non pericolo. Fa un piccolo salto quando compare (modifica appena arrivata o scheda appena aperta), poi resta fermo.
+  - Intestazione: accanto a ogni valore — PF (danni, temporanei, bonus), ogni risorsa, Follia, Fato, Oro, livello ed esperienza. Gli altri dati del personaggio (nome, razza, classi, aspetto…) hanno il segno accanto al nome.
+  - Caratteristiche, capacità, poteri, oggetti: accanto al **nome** dell'elemento, accanto all'icona delle domande; il riquadro elenca tutti i campi cambiati di quell'elemento. Vale anche per un elemento aggiunto.
+  - Gli elementi eliminati compaiono solo nello storico.
+- **Clic sul segno**: un riquadro con valore prima → dopo, motivazione, nome del Master e data (tutte le modifiche non ancora tolte su quel valore) e il pulsante **Togli**, che fa sparire il segno.
+- Il segno lo vede **solo il giocatore**. Il Master **non sa** se il giocatore l'ha tolto.
+- **Badge per il giocatore**: sulla **linguetta dell'elemento** modificato (Capacità, Poteri, Inventario, Allenamenti…) il numero di modifiche con il segno ancora presente. Intestazione e caratteristiche non hanno linguetta: il segno sta direttamente sul valore, sempre a vista (su telefono le caratteristiche stanno in Capacità, quindi il numero va lì). Sulla linguetta **Domande** il numero è la **somma** delle domande con risposta da leggere e delle modifiche con il segno ancora presente.
+- **Storico** (filtro "Modifiche del Master"): tutte le modifiche, dalla più recente, raggruppate per salvataggio. Per ogni voce: elemento, campo, prima → dopo, motivazione, Master, data. Non si risponde e non si annulla. Lo vedono sia il giocatore sia il Master. Per il giocatore, i salvataggi con segni ancora presenti sono evidenziati in bordeaux (con l'asterisco accanto a ogni voce) e hanno il pulsante **Togli**, che toglie i segni di quel salvataggio: si possono togliere da qui o dal segno sulla scheda (da qui anche quelli degli elementi eliminati, che sulla scheda non ci sono più).
+- **Numeri sui filtri** di Domande, uguali al badge della linguetta: per il giocatore su "Con risposta" e "Modifiche del Master"; per il Master su "In attesa".
 
 ---
 
@@ -207,6 +226,7 @@ src/
     inventory/     inventario
     journal/       diario
     threads/       domande al Master
+    masterEdits/   modifiche del Master: motivazione, segni, storico
     dice/          lanciatore e registro
     compendium/    compendio
     master/        pannello Master

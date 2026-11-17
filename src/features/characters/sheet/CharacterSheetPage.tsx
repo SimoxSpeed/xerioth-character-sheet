@@ -28,7 +28,13 @@ import { JournalTab } from './journal/JournalTab'
 import { QuestionsTab } from './questions/QuestionsTab'
 import { DiceTab } from './dice/DiceTab'
 import { TrainingTab } from './training/TrainingTab'
-import { CanRollContext, RollContext, type RollRequest } from './sheetContext'
+import { CanRollContext, IsOwnerContext, RollContext, type RollRequest } from './sheetContext'
+import { openEdits, useMasterEdits, useMasterEditsRealtime, type EditFilter } from '../../masterEdits/api'
+import { ReasonGateProvider } from '../../masterEdits/ReasonGateProvider'
+import { useMediaQuery } from '../../../lib/useMediaQuery'
+
+/** Tutte le modifiche segnalabili, per il badge di Domande. */
+const ALL_EDITS: EditFilter[] = (['character', 'class', 'attribute', 'resource', 'skill', 'power', 'item', 'xp'] as const).map((type) => ({ type }))
 import styles from './CharacterSheetPage.module.less'
 
 type TabKey = 'capacita' | 'poteri' | 'inventario' | 'diario' | 'allenamenti' | 'domande' | 'tiri'
@@ -51,6 +57,7 @@ export function CharacterSheetPage() {
   const { characterId = '' } = useParams()
   const { data: sheet, isPending, error } = useCharacterSheet(characterId)
   useCharacterThreadsRealtime(characterId)
+  useMasterEditsRealtime(characterId)
   useDiceRealtime(sheet?.campaign_id)
 
   if (isPending) return <p className="muted">Caricamento scheda…</p>
@@ -68,21 +75,39 @@ function Sheet({ sheet }: { sheet: CharacterSheet }) {
 
   const roll = useCallback((request: RollRequest) => setRollRequest((r) => ({ ...request, n: (r?.n ?? 0) + 1 })), [])
 
+  const { data: edits } = useMasterEdits(sheet.id)
+  // Caratteristiche dentro la linguetta Capacità (schermi stretti)
+  const attributesInSkills = useMediaQuery('(max-width: 1099px)')
+
   const isOwner = sheet.owner_id === user.id
   // Badge: al giocatore le risposte da leggere, al Master le domande in attesa.
   const pendingQuestions = (threads ?? []).filter((t) => t.status === (isOwner ? 'answered' : 'open')).length
 
+  // Modifiche del Master con il segno ancora presente (le vede solo il giocatore)
+  const marked = (filters: EditFilter[]) => (isOwner ? openEdits(edits, filters).length : 0)
+  const count = (n: number) => (n > 0 ? n : null)
+  const skillMarks = marked([{ type: 'skill' }, ...(attributesInSkills ? [{ type: 'attribute' as const }] : [])])
+  const allMarks = marked(ALL_EDITS)
+
   // Una sezione per ogni tipo di potere concesso dalle classi ("Miracoli", "Incantesimi"…).
   const powerSections = sheetPowerSections(sheet)
   const tabs: TabDef[] = [
-    { key: 'capacita', label: 'Capacità', icon: SkillsIcon, badge: null },
+    { key: 'capacita', label: 'Capacità', icon: SkillsIcon, badge: count(skillMarks) },
     ...(powerSections.length > 0
-      ? [{ key: 'poteri' as const, label: powerSections.length === 1 ? powerSections[0]!.label : 'Poteri', icon: PowersIcon, badge: null }]
+      ? [
+          {
+            key: 'poteri' as const,
+            label: powerSections.length === 1 ? powerSections[0]!.label : 'Poteri',
+            icon: PowersIcon,
+            badge: count(marked([{ type: 'power' }])),
+          },
+        ]
       : []),
-    { key: 'inventario', label: 'Inventario', icon: InventoryIcon, badge: null },
+    { key: 'inventario', label: 'Inventario', icon: InventoryIcon, badge: count(marked([{ type: 'item' }])) },
     { key: 'diario', label: 'Diario', icon: StoryIcon, badge: null },
     { key: 'allenamenti', label: 'Allenamenti', icon: TrainingIcon, badge: null },
-    { key: 'domande', label: 'Domande', icon: AskIcon, badge: pendingQuestions > 0 ? pendingQuestions : null },
+    // Domande: risposte da leggere più modifiche del Master da vedere
+    { key: 'domande', label: 'Domande', icon: AskIcon, badge: count(pendingQuestions + allMarks) },
     { key: 'tiri', label: 'Tiri', icon: DiceIcon, badge: null },
   ]
   const tab = tabs.find((t) => t.key === params.get('scheda'))?.key ?? 'capacita'
@@ -96,10 +121,14 @@ function Sheet({ sheet }: { sheet: CharacterSheet }) {
   const mobileTabs = tabs.filter((t) => PRIMARY_MOBILE.includes(t.key))
   const otherTabs = tabs.filter((t) => !PRIMARY_MOBILE.includes(t.key))
   const otherActive = otherTabs.some((t) => t.key === tab)
+  // "Altro" somma le linguette che contiene; Domande comprende già tutte le modifiche
   const otherBadge = otherTabs.reduce((n, t) => n + (t.badge ?? 0), 0)
 
   return (
-    // Si tira solo sui propri personaggi: il Master non tira per i giocatori
+    // Si tira solo sui propri personaggi: il Master non tira per i giocatori.
+    // Sulla scheda di un giocatore ogni modifica del Master chiede la motivazione.
+    <ReasonGateProvider characterId={sheet.id} enabled={isMaster && !isOwner}>
+    <IsOwnerContext.Provider value={isOwner}>
     <CanRollContext.Provider value={isOwner}>
     <RollContext.Provider value={roll}>
         <div className={styles.sheet}>
@@ -236,6 +265,8 @@ function Sheet({ sheet }: { sheet: CharacterSheet }) {
         </div>
     </RollContext.Provider>
     </CanRollContext.Provider>
+    </IsOwnerContext.Provider>
+    </ReasonGateProvider>
   )
 }
 

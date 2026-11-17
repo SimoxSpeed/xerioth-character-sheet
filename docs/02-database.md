@@ -75,6 +75,7 @@ erDiagram
   characters ||--o{ character_xp_entries : ""
   characters ||--o{ journal_entries : ""
   characters ||--o{ master_threads : ""
+  characters ||--o{ master_edits : ""
   master_threads ||--o{ thread_messages : ""
   campaigns ||--o{ dice_rolls : ""
 ```
@@ -309,6 +310,40 @@ Le **preghiere** usano lo stesso meccanismo: una preghiera è una voce di diario
 
 Notifiche: badge con il numero di domande in attesa e aggiornamento in tempo reale (Supabase Realtime). Le notifiche email si possono aggiungere più avanti.
 
+### 2.3b Modifiche del Master
+
+> ✅ **Applicata** il 17/11/2026 (`20261117211855_master_edits.sql`).
+
+Il Master può cambiare **qualsiasi** dato della scheda di un giocatore. Ogni modifica:
+1. viene **segnalata al giocatore** con un asterisco bordeaux accanto al valore cambiato;
+2. può avere una **motivazione** (facoltativa), che il Master scrive al momento del salvataggio;
+3. resta per sempre nello **storico** ("Modifiche del Master", linguetta Domande), anche dopo che il giocatore ha **tolto** il segno.
+
+Conta come modifica del Master ogni scrittura fatta da un Master della campagna su un personaggio **di cui non è il proprietario**. Le modifiche del Master ai propri personaggi non si registrano.
+
+**`master_edits`**
+| Colonna | Tipo | Note |
+|---|---|---|
+| `id` | uuid PK | |
+| `character_id` | → characters | |
+| `target_type` | enum `edit_target` | `character`, `class`, `attribute`, `resource`, `skill`, `power`, `item`, `xp` |
+| `target_id` | text nullable | id dell'elemento (o chiave della caratteristica / risorsa); null per i dati del personaggio |
+| `target_label` | text | nome dell'elemento al momento della modifica ("Corrosione", "Bracciale Vita"), così si legge anche dopo un'eliminazione |
+| `action` | enum `edit_action` | `insert` (aggiunto), `update` (cambiato), `delete` (eliminato) |
+| `field` | text nullable | colonna cambiata (`level`, `damage_taken`, `description`…); null per aggiunte ed eliminazioni |
+| `old_value`, `new_value` | jsonb nullable | valore prima e dopo |
+| `reason` | text nullable | motivazione del Master |
+| `edited_by` | → profiles | Master che ha modificato |
+| `created_at` | timestamptz | uguale per tutte le righe dello stesso salvataggio |
+| `updated_at` | timestamptz | ultima modifica della riga (vedi "Modifiche ripetute") |
+| `dismissed_at` | timestamptz nullable | il giocatore ha tolto il segno; serve solo al giocatore, il Master non lo vede |
+
+- **Le scrive il database**, non l'app: un trigger `after insert/update/delete` su `characters`, `character_classes`, `character_attributes`, `character_resources`, `character_skills`, `character_powers`, `character_items` e `character_xp_entries` registra una riga per ogni colonna cambiata (esclusi `updated_at` e `sort_order`). Così nessuna modifica sfugge, da qualunque punto della scheda arrivi.
+- **Modifiche ripetute**: se lo stesso valore (stessi `target_type`, `target_id`, `field`) viene cambiato di nuovo mentre il segno è ancora presente (`dismissed_at` null), il trigger **aggiorna la riga esistente** invece di crearne una nuova: `old_value` resta il valore di partenza, `new_value` diventa l'ultimo, `reason` e `edited_by` diventano quelli dell'ultima modifica, `updated_at` si aggiorna. Dopo che il giocatore ha tolto il segno, una nuova modifica crea una riga nuova.
+- **Motivazione**: l'app la invia insieme alla scrittura in un'intestazione della richiesta (`x-edit-reason`, codificata in base64 per gli accenti); il trigger la legge da `request.headers` e la salva nelle righe.
+- **Togliere il segno**: funzione `dismiss_master_edits(ids)`, solo per il proprietario; imposta `dismissed_at`. Le righe non si cancellano mai.
+- In tempo reale (Realtime), così il segno compare al giocatore mentre ha la scheda aperta.
+
 ### 2.4 Tiri di dado
 
 > ✅ Si tira **solo sui propri personaggi** (`20261117211147_roll_own_characters_only.sql`): la policy `dice_rolls_insert` usa `is_character_owner` al posto di `can_access_character`, quindi il Master non può tirare sulle schede dei giocatori; i tiri esistenti restano visibili come prima.
@@ -346,12 +381,13 @@ L'uso dei Punti Fato **non** si registra.
 |---|---|
 | **Giocatore** | leggere e modificare **solo i propri** personaggi (e tabelle figlie) **delle campagne di cui è membro**; vedere i tiri pubblici della propria campagna; vedere le proprie richieste di ingresso e il nome delle campagne a cui le ha inviate |
 | **Qualsiasi utente** | creare una campagna (ne diventa Master) |
-| **Master** (della campagna) | leggere e modificare **tutti** i personaggi della campagna, ma **non tirare** sui personaggi altrui; modificare nome e descrizione della campagna; rispondere alle domande; creare e revocare inviti; accettare o rifiutare le richieste (e vedere il nome di chi chiede); rimuovere i giocatori |
+| **Master** (della campagna) | leggere e modificare **tutti** i personaggi della campagna (le modifiche ai personaggi altrui finiscono in `master_edits`, §2.3b), ma **non tirare** sui personaggi altrui; modificare nome e descrizione della campagna; rispondere alle domande; creare e revocare inviti; accettare o rifiutare le richieste (e vedere il nome di chi chiede); rimuovere i giocatori |
 | **Nessuno** dall'app | cambiare ruoli; entrare in una campagna senza invito e richiesta accettata; rimuovere un Master |
 
 - Il proprietario accede ai suoi personaggi **solo se è membro** della loro campagna: le regole su `characters` e le funzioni `can_access_character` / `is_character_owner` controllano anche `is_campaign_member`. Così un giocatore rimosso non vede più le schede di quella campagna, ma restano al loro posto.
 - `campaign_invites`: lettura, creazione e revoca (`revoked_at`) solo per il Master della campagna.
 - `campaign_join_requests`: lettura per chi ha chiesto e per il Master della campagna; nessuna scrittura diretta (solo dalle funzioni del §2.1b).
+- `master_edits`: lettura per il proprietario del personaggio e per il Master della campagna; nessuna scrittura diretta (le righe le crea il trigger, il segno si toglie con `dismiss_master_edits`).
 - `campaigns`: leggibile anche da chi ha una richiesta `pending` verso la campagna (per mostrarne il nome).
 - `profiles`: leggibile anche dal Master di una campagna verso cui l'utente ha una richiesta `pending`.
 

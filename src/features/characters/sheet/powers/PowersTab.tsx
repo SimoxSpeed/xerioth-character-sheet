@@ -14,6 +14,7 @@ import { AskMasterButton } from '../../../threads/AskMasterButton'
 import { useCanRoll, useRollTrigger } from '../sheetContext'
 import { NoRoll, ProgressLine } from '../SheetBits'
 import { ThreadDot } from '../ThreadDot'
+import { EditMark } from '../EditMark'
 import { PowerDialog } from './PowerDialog'
 import styles from './PowersTab.module.less'
 
@@ -175,6 +176,7 @@ function PowerCard({ sheet, power, section, quickPct, onEdit }: CardProps) {
           {power.is_special && <span className={styles.badgeSpecial}>Speciale</span>}
           {power.granted_by && <span className={styles.badgeGranted}>{power.granted_by}</span>}
           <ThreadDot characterId={sheet.id} targetType="power" targetId={power.id} />
+          <EditMark characterId={sheet.id} filters={[{ type: 'power', id: power.id }]} />
         </div>
 
         {power.is_maxed ? (

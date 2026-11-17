@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Dialog } from '../../../../components/Dialog'
 import { useAddItem, useUpdateItem, type CharacterSheet, type ItemRow } from '../../api'
+import { saved, visibleError } from '../../../masterEdits/gate'
 import styles from '../powers/PowerDialog.module.less'
 
 interface Props {
@@ -52,7 +53,7 @@ function ItemForm({
   const [description, setDescription] = useState(item?.description ?? '')
 
   const pending = add.isPending || update.isPending
-  const error = add.error ?? update.error
+  const error = visibleError(add.error ?? update.error)
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
@@ -68,9 +69,8 @@ function ItemForm({
       value: value.trim() || null,
       description: description.trim(),
     }
-    if (item) await update.mutateAsync({ id: item.id, patch: fields })
-    else await add.mutateAsync(fields)
-    onDone()
+    const done = await saved(item ? update.mutateAsync({ id: item.id, patch: fields }) : add.mutateAsync(fields))
+    if (done) onDone()
   }
 
   return (

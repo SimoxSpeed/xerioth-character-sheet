@@ -815,6 +815,72 @@ export type Database = {
           },
         ]
       }
+      master_edits: {
+        Row: {
+          action: Database["public"]["Enums"]["edit_action"]
+          character_id: string
+          created_at: string
+          dismissed_at: string | null
+          edited_by: string | null
+          field: string | null
+          id: string
+          new_value: Json | null
+          old_value: Json | null
+          reason: string | null
+          target_id: string | null
+          target_label: string
+          target_type: Database["public"]["Enums"]["edit_target"]
+          updated_at: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["edit_action"]
+          character_id: string
+          created_at?: string
+          dismissed_at?: string | null
+          edited_by?: string | null
+          field?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          reason?: string | null
+          target_id?: string | null
+          target_label?: string
+          target_type: Database["public"]["Enums"]["edit_target"]
+          updated_at?: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["edit_action"]
+          character_id?: string
+          created_at?: string
+          dismissed_at?: string | null
+          edited_by?: string | null
+          field?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          reason?: string | null
+          target_id?: string | null
+          target_label?: string
+          target_type?: Database["public"]["Enums"]["edit_target"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_edits_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_edits_edited_by_fkey"
+            columns: ["edited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       master_threads: {
         Row: {
           character_id: string
@@ -942,6 +1008,7 @@ export type Database = {
         Args: { p_accept: boolean; p_request_id: string }
         Returns: undefined
       }
+      dismiss_master_edits: { Args: { p_ids: string[] }; Returns: undefined }
       invite_info: {
         Args: { p_invite_id: string }
         Returns: {
@@ -964,6 +1031,16 @@ export type Database = {
         | "freddezza"
         | "fascino"
       die_kind: "d20" | "d4" | "coin" | "d6" | "d8" | "d10" | "d12" | "d100"
+      edit_action: "insert" | "update" | "delete"
+      edit_target:
+        | "character"
+        | "class"
+        | "attribute"
+        | "resource"
+        | "skill"
+        | "power"
+        | "item"
+        | "xp"
       item_category: "usable" | "equipment"
       item_slot: "weapon" | "armor"
       join_request_status: "pending" | "accepted" | "rejected"
@@ -1125,6 +1202,17 @@ export const Constants = {
         "fascino",
       ],
       die_kind: ["d20", "d4", "coin", "d6", "d8", "d10", "d12", "d100"],
+      edit_action: ["insert", "update", "delete"],
+      edit_target: [
+        "character",
+        "class",
+        "attribute",
+        "resource",
+        "skill",
+        "power",
+        "item",
+        "xp",
+      ],
       item_category: ["usable", "equipment"],
       item_slot: ["weapon", "armor"],
       join_request_status: ["pending", "accepted", "rejected"],

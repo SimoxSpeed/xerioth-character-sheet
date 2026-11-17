@@ -4,6 +4,7 @@ import { SKILLS, type SkillDefinition } from '../../../../game/data/skills'
 import { checkRequirements } from '../../../../game/rules'
 import { Dialog } from '../../../../components/Dialog'
 import { attributeValues, skillLevels, useAddSkill, type CharacterSheet } from '../../api'
+import { saved, visibleError } from '../../../masterEdits/gate'
 import styles from './AddSkillDialog.module.less'
 import { CheckIcon, CloseIcon, InfoIcon } from '../../../../components/icons'
 
@@ -97,7 +98,7 @@ function CatalogPicker({ sheet }: { sheet: CharacterSheet }) {
         </label>
       </div>
 
-      {add.error && <p className="error-box">Errore: {add.error.message}</p>}
+      {visibleError(add.error) && <p className="error-box">Errore: {add.error?.message}</p>}
 
       <ul className={styles.list}>
         {entries.map(({ skill, checks, allMet }) => {
@@ -148,13 +149,15 @@ function CustomSkillForm({ sheet, onDone }: { sheet: CharacterSheet; onDone: () 
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
-    await add.mutateAsync({
-      skillKey: null,
-      customName: name,
-      attribute,
-      level: level === '' ? null : Math.max(0, Number(level) || 0),
-    })
-    onDone()
+    const done = await saved(
+      add.mutateAsync({
+        skillKey: null,
+        customName: name,
+        attribute,
+        level: level === '' ? null : Math.max(0, Number(level) || 0),
+      }),
+    )
+    if (done) onDone()
   }
 
   return (
@@ -182,7 +185,7 @@ function CustomSkillForm({ sheet, onDone }: { sheet: CharacterSheet; onDone: () 
           <input className="input" type="number" min={0} value={level} onChange={(e) => setLevel(e.target.value)} />
         </label>
       </div>
-      {add.error && <p className="error-box">Errore: {add.error.message}</p>}
+      {visibleError(add.error) && <p className="error-box">Errore: {add.error?.message}</p>}
       <div className={styles.customActions}>
         <button className="btn btn--primary" type="submit" disabled={!name.trim() || add.isPending}>
           Aggiungi
