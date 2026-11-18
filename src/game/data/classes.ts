@@ -11,15 +11,18 @@ export interface ResourceDef {
   label: string
   /** Tetto massimo assoluto, se esiste (es. Punti Spirito: 600). */
   cap?: number
-  /** true se il massimo si calcola con una formula (Punti Mana). */
+  /**
+   * true per Punti Mana, Punti Mente e Anima: stesso calcolo del massimo (docs/01 §3)
+   * e costo di lancio dalla tabella A108.
+   */
   computed?: boolean
 }
 
 export const RESOURCES: Record<ResourceKey, ResourceDef> = {
   spirito: { key: 'spirito', label: 'Punti Spirito', cap: 600 },
   mana: { key: 'mana', label: 'Punti Mana', computed: true },
-  mente: { key: 'mente', label: 'Punti Mente' },
-  anima: { key: 'anima', label: 'Punti Anima' },
+  mente: { key: 'mente', label: 'Punti Mente', computed: true },
+  anima: { key: 'anima', label: 'Punti Anima', computed: true },
 }
 
 export const POWER_KINDS: Record<PowerKind, { label: string; singular: string }> = {

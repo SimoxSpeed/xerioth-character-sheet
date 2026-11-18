@@ -113,7 +113,7 @@ Destrezza                             LIV
 - Clic sul livello per cambiarlo, sui punti per aggiungere/togliere; nel dettaglio (freccia a destra): descrizione, acquisizione, MAX, domanda al Master, modifica completa, elimina.
 - **Riuscita**: il totale fissato (es. 43), in sola lettura nella riga. Il Master la fissa dalla **modifica del potere**: sceglie il **Dado riuscita** e accanto vede la **Riuscita** che ne risulta; al salvataggio si salva quel totale. A livello 0 il dado è bloccato a 20.
 - **Lancio Rapido**: interruttore nella barra in alto (solo se il personaggio ha la capacità); acceso, costo e tempo mostrati sono quelli modificati.
-- Classi con Punti Mana: sotto **Costo** c'è direttamente il **costo della tabella A108**. Le altre (es. Sacerdoti) vedono il costo scritto, anche "ND". Nessuna etichetta "da tabella".
+- Classi con Mana, Punti Mente o Anima: sotto **Costo** c'è direttamente il **costo della tabella A108**. Le altre (es. Sacerdoti) vedono il costo scritto, anche "ND". Nessuna etichetta "da tabella".
 
 ### 3b. Allenamenti
 - Punti al giorno per discipline mentali e fisiche (base, capacità di supporto, booster).

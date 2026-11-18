@@ -1,5 +1,14 @@
+import { RESOURCES, type ResourceKey } from '../data/classes'
 import { CAST_COST_TABLE, MANA_LEVEL_SUM_TABLE } from '../data/mana'
 import { attributeModifier } from './attributes'
+
+// Punti Mente (Mentalisti) e Anima (Incantatori, Druidi) si calcolano come i Punti Mana
+// e usano la stessa tabella del costo di lancio.
+
+/** true se la risorsa usa la formula dei Punti Mana e la tabella del costo di lancio. */
+export function usesManaRules(resource: ResourceKey | null | undefined): boolean {
+  return resource != null && RESOURCES[resource].computed === true
+}
 
 export interface ManaInput {
   intelligenza: number

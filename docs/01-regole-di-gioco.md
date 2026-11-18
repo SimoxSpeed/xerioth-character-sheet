@@ -108,15 +108,15 @@ Verifica (Omnia): (13 + 1 + 0) × 7 + 100 = **198**; 198 − 44 danni = **154**.
 | **Punti Follia** | contatore del giocatore, nessun calcolo |
 | **Punti Fato** | contatore del giocatore, nessun calcolo |
 | **Punti Spirito** (sacerdoti) | attuali comunicati dal Master; massimo assoluto **600** (Omnia: 125 attuali) |
-| **Punti Mana** (maghi) | **calcolabili** (vedi sotto) |
-| **Punti Mente** (mentalisti), **Punti Anima**, … | da definire per classe ❓ |
+| **Punti Mana** (Alteratori, Evocatori, Elementalisti, Necromanti, Magia Pura) | **calcolabili** (vedi sotto) |
+| **Punti Mente** (Mentalisti), **Anima** (Incantatori, Druidi) | **calcolabili** come i Punti Mana |
 | **Monete d'oro** | contatore |
 
 Il tipo di risorsa dipende dalla **classe** (vedi template di classe in 02).
 
-### Punti Mana (maghi)
+### Punti Mana, Punti Mente e Anima
 
-Fonte: *Avanzamenti › Calcolo punti mana*.
+Fonte: *Avanzamenti › Calcolo punti mana*. Punti Mente e Anima usano lo **stesso calcolo** e la **stessa tabella del costo di lancio** (`usesManaRules` in `src/game/rules/mana.ts`).
 
 ```
 Punti Mana = Intelligenza
@@ -134,7 +134,7 @@ Verifica (esempio del foglio): 21 + 3² + 11×3 + T(28)=296 + 8² = **423**. ✅
 
 Fonte: *Avanzamenti › A108 (Punti mana che servono per lanciare incantesimi)*. Tabella a doppia entrata: **Bonus** = livello attuale dell'incantesimo (0–10) × **Livello** = livello di acquisizione (1–10). Esempio: acquisizione 3, livello attuale 2 → **25**.
 
-Vale **solo per chi ha Punti Mana** (dipende dalla classe; elenco completo in arrivo): sotto **Costo** si vede direttamente il valore della tabella, senza etichette. I Sacerdoti (Punti Spirito) non la usano: il costo è quello scritto, anche "ND".
+Vale **per chi usa Mana, Punti Mente o Anima** (dipende dalla classe): sotto **Costo** si vede direttamente il valore della tabella, senza etichette. I Sacerdoti (Punti Spirito) non la usano: il costo è quello scritto, anche "ND".
 
 Nell'app il costo **calcolato dalla tabella** compare accanto a ogni potere con livello di acquisizione noto. Il campo "costo" scritto a mano resta e **ha la precedenza**, perché alcuni costi attuali sono diversi (es. Omnia, Ruba tempo: 70).
 

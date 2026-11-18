@@ -4,6 +4,7 @@ import {
   quickCastPercent,
   scaleLeadingNumber,
   skillNextCost,
+  usesManaRules,
   type PowerSection,
 } from '../../../../game/rules'
 import { NumberField } from '../../../../components/NumberField'
@@ -111,9 +112,9 @@ function PowerCard({ sheet, power, section, quickPct, onEdit }: CardProps) {
   const remove = useDeletePower(sheet.id)
   const [expanded, setExpanded] = useState(false)
 
-  // Costo: chi ha Punti Mana vede direttamente quello della tabella A108 (livello × acquisizione);
+  // Costo: chi usa Mana, Punti Mente o Anima vede direttamente quello della tabella A108 (livello × acquisizione);
   // tutti gli altri (es. Sacerdoti, Punti Spirito) quello scritto, così com'è ("ND" compreso).
-  const tableCost = section.resource === 'mana' ? castCost(power.level, power.acquisition_level) : null
+  const tableCost = usesManaRules(section.resource) ? castCost(power.level, power.acquisition_level) : null
   const baseCost = tableCost !== null ? String(tableCost) : power.cost.trim()
 
   // Lancio Rapido attivo: tempo ridotto e costo aumentato della stessa percentuale.

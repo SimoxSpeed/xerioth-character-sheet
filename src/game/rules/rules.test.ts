@@ -18,6 +18,7 @@ import {
   rollDie,
   skillCumulativeCost,
   skillNextCost,
+  usesManaRules,
 } from './index'
 
 describe('caratteristiche', () => {
@@ -111,6 +112,14 @@ describe('mana', () => {
     expect(castCost(0, 1)).toBe(5)
     expect(castCost(10, 10)).toBe(500)
     expect(castCost(null, 3)).toBeNull()
+  })
+
+  it('Punti Mente e Anima seguono le regole del mana, i Punti Spirito no', () => {
+    expect(usesManaRules('mana')).toBe(true)
+    expect(usesManaRules('mente')).toBe(true)
+    expect(usesManaRules('anima')).toBe(true)
+    expect(usesManaRules('spirito')).toBe(false)
+    expect(usesManaRules(null)).toBe(false)
   })
 
   it('Lancio Rapido: 30% + 5% per livello oltre il primo', () => {
