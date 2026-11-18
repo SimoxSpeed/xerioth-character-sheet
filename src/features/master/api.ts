@@ -25,7 +25,7 @@ export function useParty(campaignId: string) {
           .select(
             `id, name, level, race_key, hp_bonus, temp_hp, damage_taken, portrait_url,
              owner:profiles(display_name),
-             character_classes(class_key, deity_key, patron),
+             character_classes(class_key, deity_key, element_key, patron),
              character_attributes(attribute, value),
              character_skills(skill_key, level),
              character_resources(resource_key, current, max),

@@ -1,0 +1,59 @@
+@import '../../../styles/tokens.less';
+
+.detail {
+  .sheet-box();
+  padding: @space-4 @space-4 @space-3;
+  display: flex;
+  flex-direction: column;
+  gap: @space-2;
+  // Tra la barra in alto e la barra Indietro / Avanti (fissa in fondo, circa 80px)
+  max-height: calc(100dvh - @topbar-height - 2 * @space-4 - 80px);
+  overflow-y: auto;
+
+  @media @bp-mobile {
+    max-height: none;
+  }
+}
+
+.title {
+  margin: 0;
+  font-family: @font-display;
+  font-size: 22px;
+  color: var(--accent-strong);
+}
+
+.motto {
+  margin: 0;
+  font-family: @font-display;
+  font-size: 16px;
+  font-style: italic;
+  color: var(--text-soft);
+}
+
+.intro {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.fields {
+  margin: @space-2 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: @space-3;
+
+  dt {
+    .sheet-label();
+    margin-bottom: 2px;
+  }
+
+  dd {
+    margin: 0;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+}
+
+.field {
+  padding-top: @space-2;
+  border-top: 1px solid var(--frame-soft);
+}

@@ -17,6 +17,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      alignments: {
+        Row: {
+          archetype: string
+          code: string
+          description: string
+          example: string
+          key: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          archetype?: string
+          code: string
+          description?: string
+          example?: string
+          key: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          archetype?: string
+          code?: string
+          description?: string
+          example?: string
+          key?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      armors: {
+        Row: {
+          armor_type: string
+          description: string
+          key: string
+          name: string
+          note: string
+          requirement: string
+          sort_order: number
+        }
+        Insert: {
+          armor_type?: string
+          description?: string
+          key: string
+          name: string
+          note?: string
+          requirement?: string
+          sort_order?: number
+        }
+        Update: {
+          armor_type?: string
+          description?: string
+          key?: string
+          name?: string
+          note?: string
+          requirement?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       campaign_invites: {
         Row: {
           campaign_id: string
@@ -231,6 +291,7 @@ export type Database = {
           class_key: string
           created_at: string
           deity_key: string | null
+          element_key: string | null
           id: string
           patron: string | null
           sort_order: number
@@ -241,6 +302,7 @@ export type Database = {
           class_key: string
           created_at?: string
           deity_key?: string | null
+          element_key?: string | null
           id?: string
           patron?: string | null
           sort_order?: number
@@ -251,6 +313,7 @@ export type Database = {
           class_key?: string
           created_at?: string
           deity_key?: string | null
+          element_key?: string | null
           id?: string
           patron?: string | null
           sort_order?: number
@@ -263,6 +326,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "characters"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "character_classes_class_key_fkey"
+            columns: ["class_key"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "character_classes_deity_key_fkey"
+            columns: ["deity_key"]
+            isOneToOne: false
+            referencedRelation: "deities"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "character_classes_element_key_fkey"
+            columns: ["element_key"]
+            isOneToOne: false
+            referencedRelation: "elements"
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -491,6 +575,13 @@ export type Database = {
             referencedRelation: "characters"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "character_skills_skill_key_fkey"
+            columns: ["skill_key"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["key"]
+          },
         ]
       }
       character_xp_entries: {
@@ -616,6 +707,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "characters_alignment_key_fkey"
+            columns: ["alignment_key"]
+            isOneToOne: false
+            referencedRelation: "alignments"
+            referencedColumns: ["key"]
+          },
+          {
             foreignKeyName: "characters_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
@@ -629,7 +727,101 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "characters_race_key_fkey"
+            columns: ["race_key"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["key"]
+          },
         ]
+      }
+      classes: {
+        Row: {
+          key: string
+          kind: Database["public"]["Enums"]["class_kind"]
+          motto: string
+          name: string
+          power_attribute: Database["public"]["Enums"]["attribute_key"] | null
+          power_kind: Database["public"]["Enums"]["power_kind"] | null
+          power_label: string | null
+          power_singular: string | null
+          requires_deity: boolean
+          requires_element: boolean
+          resource_key: string | null
+          sections: Json
+          sort_order: number
+          summary: string
+        }
+        Insert: {
+          key: string
+          kind: Database["public"]["Enums"]["class_kind"]
+          motto?: string
+          name: string
+          power_attribute?: Database["public"]["Enums"]["attribute_key"] | null
+          power_kind?: Database["public"]["Enums"]["power_kind"] | null
+          power_label?: string | null
+          power_singular?: string | null
+          requires_deity?: boolean
+          requires_element?: boolean
+          resource_key?: string | null
+          sections?: Json
+          sort_order?: number
+          summary?: string
+        }
+        Update: {
+          key?: string
+          kind?: Database["public"]["Enums"]["class_kind"]
+          motto?: string
+          name?: string
+          power_attribute?: Database["public"]["Enums"]["attribute_key"] | null
+          power_kind?: Database["public"]["Enums"]["power_kind"] | null
+          power_label?: string | null
+          power_singular?: string | null
+          requires_deity?: boolean
+          requires_element?: boolean
+          resource_key?: string | null
+          sections?: Json
+          sort_order?: number
+          summary?: string
+        }
+        Relationships: []
+      }
+      deities: {
+        Row: {
+          divine_weapon: string
+          domain: string
+          key: string
+          lore: string
+          miracle_examples: string
+          motto: string
+          name: string
+          outsiders: string
+          sort_order: number
+        }
+        Insert: {
+          divine_weapon?: string
+          domain?: string
+          key: string
+          lore?: string
+          miracle_examples?: string
+          motto?: string
+          name: string
+          outsiders?: string
+          sort_order?: number
+        }
+        Update: {
+          divine_weapon?: string
+          domain?: string
+          key?: string
+          lore?: string
+          miracle_examples?: string
+          motto?: string
+          name?: string
+          outsiders?: string
+          sort_order?: number
+        }
+        Relationships: []
       }
       dice_roll_feed: {
         Row: {
@@ -753,6 +945,54 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      elements: {
+        Row: {
+          creatures: string
+          deity_key: string | null
+          key: string
+          name: string
+          nature: string
+          opposite_key: string | null
+          sort_order: number
+          spell_examples: string
+        }
+        Insert: {
+          creatures?: string
+          deity_key?: string | null
+          key: string
+          name: string
+          nature?: string
+          opposite_key?: string | null
+          sort_order?: number
+          spell_examples?: string
+        }
+        Update: {
+          creatures?: string
+          deity_key?: string | null
+          key?: string
+          name?: string
+          nature?: string
+          opposite_key?: string | null
+          sort_order?: number
+          spell_examples?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "elements_deity_key_fkey"
+            columns: ["deity_key"]
+            isOneToOne: false
+            referencedRelation: "deities"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "elements_opposite_key_fkey"
+            columns: ["opposite_key"]
+            isOneToOne: false
+            referencedRelation: "elements"
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -956,6 +1196,104 @@ export type Database = {
         }
         Relationships: []
       }
+      race_families: {
+        Row: {
+          intro: string
+          key: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          intro?: string
+          key: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          intro?: string
+          key?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      races: {
+        Row: {
+          appearance: string
+          family_key: string
+          hp_coefficient: number | null
+          key: string
+          name: string
+          size_lifespan: string
+          society: string
+          sort_order: number
+          traits: string
+          typical_alignment: string
+        }
+        Insert: {
+          appearance?: string
+          family_key: string
+          hp_coefficient?: number | null
+          key: string
+          name: string
+          size_lifespan?: string
+          society?: string
+          sort_order?: number
+          traits?: string
+          typical_alignment?: string
+        }
+        Update: {
+          appearance?: string
+          family_key?: string
+          hp_coefficient?: number | null
+          key?: string
+          name?: string
+          size_lifespan?: string
+          society?: string
+          sort_order?: number
+          traits?: string
+          typical_alignment?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "races_family_key_fkey"
+            columns: ["family_key"]
+            isOneToOne: false
+            referencedRelation: "race_families"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      skills: {
+        Row: {
+          attribute: Database["public"]["Enums"]["attribute_key"]
+          description: string
+          key: string
+          max_level: number
+          name: string
+          requirements: Json
+          sort_order: number
+        }
+        Insert: {
+          attribute: Database["public"]["Enums"]["attribute_key"]
+          description?: string
+          key: string
+          max_level: number
+          name: string
+          requirements?: Json
+          sort_order?: number
+        }
+        Update: {
+          attribute?: Database["public"]["Enums"]["attribute_key"]
+          description?: string
+          key?: string
+          max_level?: number
+          name?: string
+          requirements?: Json
+          sort_order?: number
+        }
+        Relationships: []
+      }
       thread_messages: {
         Row: {
           author_id: string
@@ -995,6 +1333,44 @@ export type Database = {
           },
         ]
       }
+      weapons: {
+        Row: {
+          category: string
+          key: string
+          name: string
+          note: string
+          requirement: string
+          skill_key: string | null
+          sort_order: number
+        }
+        Insert: {
+          category?: string
+          key: string
+          name: string
+          note?: string
+          requirement?: string
+          skill_key?: string | null
+          sort_order?: number
+        }
+        Update: {
+          category?: string
+          key?: string
+          name?: string
+          note?: string
+          requirement?: string
+          skill_key?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weapons_skill_key_fkey"
+            columns: ["skill_key"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1030,6 +1406,7 @@ export type Database = {
         | "riflessi"
         | "freddezza"
         | "fascino"
+      class_kind: "class" | "career"
       die_kind: "d20" | "d4" | "coin" | "d6" | "d8" | "d10" | "d12" | "d100"
       edit_action: "insert" | "update" | "delete"
       edit_target:
@@ -1201,6 +1578,7 @@ export const Constants = {
         "freddezza",
         "fascino",
       ],
+      class_kind: ["class", "career"],
       die_kind: ["d20", "d4", "coin", "d6", "d8", "d10", "d12", "d100"],
       edit_action: ["insert", "update", "delete"],
       edit_target: [

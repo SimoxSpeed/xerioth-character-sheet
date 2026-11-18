@@ -1,5 +1,5 @@
 // Funzioni e costanti condivise dalle sezioni della scheda (fuori dai componenti per l'HMR).
-import { findSkill } from '../../../game/data/skills'
+import { getCatalog } from '../../catalog/store'
 import { powerSections, type PowerSection } from '../../../game/rules'
 import type { CharacterSheet, ItemRow, SkillRow } from '../api'
 
@@ -12,13 +12,13 @@ export const MASTER_OPTIONS = [
 ]
 
 export function skillDisplayName(skill: Pick<SkillRow, 'custom_name' | 'skill_key'>): string {
-  return skill.custom_name || findSkill(skill.skill_key)?.name || skill.skill_key || 'Capacità'
+  return skill.custom_name || getCatalog().skill(skill.skill_key)?.name || skill.skill_key || 'Capacità'
 }
 
 /** Sezioni dei poteri del personaggio (in base alle classi e ai poteri già presenti). */
 export function sheetPowerSections(sheet: CharacterSheet): PowerSection[] {
   return powerSections(
-    sheet.character_classes.map((c) => c.class_key),
+    sheet.character_classes.flatMap((c) => getCatalog().klass(c.class_key) ?? []),
     sheet.character_powers.map((p) => p.kind),
   )
 }

@@ -1,5 +1,6 @@
 import type { AttributeKey } from '../data/attributes'
-import { POWER_KINDS, findClass, type PowerKind, type ResourceKey } from '../data/classes'
+import type { ClassDefinition } from '../catalog'
+import { POWER_KINDS, type PowerKind, type ResourceKey } from '../data/classes'
 
 /** Una sezione della scheda Poteri: un tipo di potere con l'etichetta scelta dalla classe. */
 export interface PowerSection {
@@ -22,11 +23,13 @@ export interface PowerSection {
  * Ogni sezione è una scheda a sé ("Miracoli", "Incantesimi"…); due classi con lo stesso tipo
  * (es. due divinità) condividono la stessa scheda. L'etichetta viene dalla prima classe.
  */
-export function powerSections(classKeys: readonly string[], existingKinds: readonly PowerKind[] = []): PowerSection[] {
+export function powerSections(
+  classes: readonly Pick<ClassDefinition, 'key' | 'powers' | 'resourceKey'>[],
+  existingKinds: readonly PowerKind[] = [],
+): PowerSection[] {
   const sections = new Map<PowerKind, PowerSection>()
-  for (const key of classKeys) {
-    const template = findClass(key)
-    const powers = template?.powers
+  for (const cls of classes) {
+    const { key, powers } = cls
     if (!powers) continue
     const existing = sections.get(powers.kind)
     if (existing) {
@@ -35,10 +38,10 @@ export function powerSections(classKeys: readonly string[], existingKinds: reado
     }
     sections.set(powers.kind, {
       kind: powers.kind,
-      label: powers.label ?? POWER_KINDS[powers.kind].label,
-      singular: powers.singular ?? POWER_KINDS[powers.kind].singular,
+      label: powers.label,
+      singular: powers.singular,
       attribute: powers.attribute,
-      resource: template.resource ?? null,
+      resource: cls.resourceKey,
       classKeys: [key],
     })
   }

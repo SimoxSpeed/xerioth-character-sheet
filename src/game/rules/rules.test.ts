@@ -57,17 +57,17 @@ describe('caratteristiche', () => {
 
 describe('punti ferita', () => {
   it('Omnia: (13 + 1 + 0) × 7 + 100 = 198; 198 − 44 = 154', () => {
-    const max = maxHp({ costituzione: 13, forzaLevel: 0, raceKey: 'umano', hpBonus: 100 })
+    const max = maxHp({ costituzione: 13, forzaLevel: 0, hpCoefficient: 7, hpBonus: 100 })
     expect(max).toBe(198)
     expect(currentHp(198, 0, 44)).toBe(154)
   })
 
-  it('esempio del foglio del Master: (16 + 2 + 9) × 7 = 189', () => {
-    expect(maxHp({ costituzione: 16, forzaLevel: 9, raceKey: 'umano', hpBonus: 0 })).toBe(189)
+  it('esempio del foglio del Master (umano, × 7): (16 + 2 + 9) × 7 = 189', () => {
+    expect(maxHp({ costituzione: 16, forzaLevel: 9, hpCoefficient: 7, hpBonus: 0 })).toBe(189)
   })
 
   it('razza senza coefficiente → null', () => {
-    expect(maxHp({ costituzione: 13, forzaLevel: 0, raceKey: 'mezzelfo', hpBonus: 0 })).toBeNull()
+    expect(maxHp({ costituzione: 13, forzaLevel: 0, hpCoefficient: null, hpBonus: 0 })).toBeNull()
   })
 })
 

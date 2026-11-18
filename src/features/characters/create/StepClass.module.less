@@ -1,0 +1,73 @@
+@import '../../../styles/tokens.less';
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: @space-5;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: @space-3;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+}
+
+.patron {
+  max-width: 320px;
+}
+
+.slots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: @space-2;
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 2px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.active-slot {
+  border-color: var(--accent);
+  background: var(--accent-soft), var(--surface);
+}
+
+.slot-name {
+  display: inline-flex;
+  align-items: center;
+  gap: @space-2;
+  padding: 6px @space-2 6px @space-3;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+// Classe ancora da completare (manca divinità o elemento)
+.incomplete {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--danger);
+}

@@ -15,8 +15,39 @@ Lingua: italiano. Pensata per il **tavolo da gioco**: portatile e telefono hanno
 | `/invito/:id` | **Invito**: nome della campagna e pulsante "Chiedi di entrare". Se c'è già una richiesta: "In attesa" o "Richiesta rifiutata"; se si è già membri: link alla home; se l'invito non vale più: "Invito scaduto" / "Invito revocato" / "Invito già usato". Senza accesso passa da `/accesso` e torna qui | tutti |
 | `/personaggi/:id` | **Scheda personaggio** | proprietario, Master |
 | `/campagne/:id/master` | **Pannello Master** (Fase 2) | Master |
-| `/compendio` | Allineamenti, divinità, razze, classi, catalogo capacità e requisiti (dati da git, sola lettura) | tutti |
+| `/compendio` | Allineamenti, divinità, razze, classi, catalogo capacità e requisiti, armi e armature (cataloghi del database, sola lettura) | tutti |
 | `/mondo/...` | Pagine informative a moduli (Fase 3), es. `/mondo/pantheon`, `/mondo/png/sereena` | in base alla visibilità |
+| `/campagne/:id/nuovo-personaggio` | **Creazione personaggio** a passi (vedi sotto) | membri della campagna |
+
+---
+
+## Creazione personaggio
+
+Tre passi, con i testi del manuale che compaiono **quando si seleziona** qualcosa. In alto i passi numerati (**1 Chi sei · 2 Classe · 3 Caratteristiche**), cliccabili per tornare indietro. In fondo **Indietro / Avanti**; all'ultimo passo **Crea personaggio**. **Avanti** si attiva quando il passo è completo. Le scelte restano tornando indietro.
+
+Le scelte sono **riquadri** (non menù a tendina) con nome e motto; quello selezionato si evidenzia e il suo testo si apre in un **pannello di dettaglio**: a destra su schermo largo, sotto il riquadro su telefono. Nessun testo di aiuto oltre a quello del manuale.
+
+### 1. Chi sei
+
+- **Nome** (obbligatorio).
+- **Razza** (obbligatoria): riquadri raggruppati come nel manuale (Umani, Elfi, Altre razze, Razze ibride). Il dettaglio mostra aspetto, taglia e longevità, allineamento tipico, società e carattere, tratti speciali; per gli elfi anche l'introduzione comune. Se la razza ha un coefficiente PF, il dettaglio lo mostra ("PF × 7").
+- **Aspetto**: età, altezza (cm), peso (kg), occhi, pelle, capelli. Tutti facoltativi.
+- **Allineamento** (facoltativo): griglia 3 × 3 (Legale / Neutrale / Caotico × Buono / Neutrale / Malvagio) con sigla e nome. Il dettaglio mostra archetipo, descrizione ed esempio.
+
+### 2. Classe
+
+- **Classe** (almeno una): riquadri raggruppati in *Scuole di magia* e *Sacerdoti*. Il dettaglio mostra motto, frase introduttiva, risorsa e le sezioni della tab del manuale (Descrizione generale, Ruolo nel gioco, Capacità collegate, Esempi…).
+- **Elementalista** → si sceglie l'**elemento** (Aria, Acqua, Fuoco, Terra, Puro): natura, esempi di incantesimi, creature affini, opposto, divinità.
+- **Sacerdote** → si sceglie la **divinità** (13): motto, dominio, la divinità, arma divina, esterni, esempi di miracoli. Sotto, **Patrono** facoltativo (es. "Vortex").
+- **Aggiungi classe** per un personaggio con più classi (es. Mentalista + …).
+- **Carriera** (facoltativa): Assassino, Ladro, Alchimista, con il loro dettaglio (gilda, capacità utili…).
+
+### 3. Caratteristiche
+
+- Le 6 caratteristiche con **− / +** e valore modificabile, partenza 10, modificatore accanto.
+- **Livello** del personaggio (partenza 1).
+- Riepilogo a vista: **PF massimi** calcolati (Costituzione + modificatore) × coefficiente della razza, oppure "—" se la razza non ha coefficiente; le risorse che avrà la scheda (Spirito, Mana, Mente, Anima) secondo le classi scelte.
+- **Crea personaggio** porta alla scheda.
 
 ---
 

@@ -1,18 +1,29 @@
-import { findClass } from '../../game/data/classes'
-import { findDeity } from '../../game/data/deities'
-import { findRace } from '../../game/data/races'
+import { getCatalog } from '../catalog/store'
 
 interface ClassLike {
   class_key: string
   deity_key: string | null
+  element_key?: string | null
   patron: string | null
 }
 
-/** "Sacerdote di Tarooth (Vortex)", "Mentalista", … */
+// Come nel manuale: "Elementalista dell'Aria", "Elementalista Puro".
+const ELEMENT_SUFFIX: Record<string, string> = {
+  aria: "dell'Aria",
+  acqua: "dell'Acqua",
+  fuoco: 'del Fuoco',
+  terra: 'della Terra',
+  puro: 'Puro',
+}
+
+/** "Sacerdote di Tarooth (Vortex)", "Elementalista del Fuoco", "Mentalista", … */
 export function classLabel(c: ClassLike): string {
-  const name = findClass(c.class_key)?.name ?? c.class_key
-  const deity = findDeity(c.deity_key)?.name
+  const catalog = getCatalog()
+  const name = catalog.klass(c.class_key)?.name ?? c.class_key
+  const deity = catalog.deity(c.deity_key)?.name
+  const element = c.element_key ? (ELEMENT_SUFFIX[c.element_key] ?? catalog.element(c.element_key)?.name) : undefined
   let label = deity ? `${name} di ${deity}` : name
+  if (element) label += ` ${element}`
   if (c.patron) label += ` (${c.patron})`
   return label
 }
@@ -22,5 +33,5 @@ export function classesLabel(classes: ClassLike[]): string {
 }
 
 export function raceLabel(key: string | null): string {
-  return findRace(key)?.name ?? (key || 'Razza non indicata')
+  return getCatalog().race(key)?.name ?? (key || 'Razza non indicata')
 }

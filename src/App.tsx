@@ -4,8 +4,9 @@ import { LoginPage } from './features/auth/LoginPage'
 import { InvitePage } from './features/campaigns/InvitePage'
 import { NewCampaignPage } from './features/campaigns/NewCampaignPage'
 import { RequireAuth } from './features/auth/RequireAuth'
+import { CatalogGate } from './features/catalog/CatalogGate'
 import { HomePage } from './features/characters/HomePage'
-import { NewCharacterPage } from './features/characters/NewCharacterPage'
+import { NewCharacterPage } from './features/characters/create/NewCharacterPage'
 import { CharacterSheetPage } from './features/characters/sheet/CharacterSheetPage'
 import { PrivacyPage } from './features/legal/PrivacyPage'
 import { MasterPanelPage } from './features/master/MasterPanelPage'
@@ -18,7 +19,9 @@ export function App() {
       <Route
         element={
           <RequireAuth>
-            <Layout />
+            <CatalogGate>
+              <Layout />
+            </CatalogGate>
           </RequireAuth>
         }
       >

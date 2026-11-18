@@ -22,6 +22,7 @@ Sostituire le schede personaggio su Google Sheets del gioco di ruolo **Xerioth**
 | [04-setup-supabase.md](04-setup-supabase.md) | Configurazione di Supabase, passo per passo |
 | [05-importazione.md](05-importazione.md) | Import dei personaggi esistenti (rimandato alla fine) |
 | [06-pubblicazione.md](06-pubblicazione.md) | Hosting su Cloudflare Pages, accesso con Google, Supabase sempre attivo |
+| [07-dubbi-manuale.md](07-dubbi-manuale.md) | Dubbi aperti e incongruenze di "Xerioth manuale" rispetto ai dati dell'app |
 
 ## Decisioni
 

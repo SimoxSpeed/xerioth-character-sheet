@@ -1,5 +1,5 @@
 import { ATTRIBUTES, type AttributeKey } from '../data/attributes'
-import { findSkill, type Requirement } from '../data/skills'
+import type { Requirement } from '../catalog'
 
 export interface RequirementContext {
   attributes: Record<AttributeKey, number>
@@ -7,6 +7,8 @@ export interface RequirementContext {
   skillLevels: Partial<Record<string, number | null>>
   /** Nomi dei poteri posseduti (miracoli/incantesimi/poteri mentali). */
   powerNames: string[]
+  /** Nome leggibile di una capacità (dal catalogo); senza, si mostra la chiave. */
+  skillName?: (key: string) => string | undefined
 }
 
 export interface RequirementCheck {
@@ -32,7 +34,7 @@ export function checkRequirement(requirement: Requirement, ctx: RequirementConte
     }
     case 'skill': {
       const level = ctx.skillLevels[requirement.skill] ?? null
-      const name = findSkill(requirement.skill)?.name ?? requirement.skill
+      const name = ctx.skillName?.(requirement.skill) ?? requirement.skill
       return {
         requirement,
         met: level !== null && level >= requirement.min,

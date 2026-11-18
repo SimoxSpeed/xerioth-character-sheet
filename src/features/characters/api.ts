@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase, unwrap } from '../../lib/supabase'
 import type { Json, Tables, TablesInsert, TablesUpdate } from '../../lib/database.types'
 import { ATTRIBUTES, ATTRIBUTE_KEYS, type AttributeKey } from '../../game/data/attributes'
-import { findClass, RESOURCES, type ResourceKey } from '../../game/data/classes'
-import { findSkill } from '../../game/data/skills'
+import { RESOURCES, type ResourceKey } from '../../game/data/classes'
+import { getCatalog } from '../catalog/store'
 import { useReasonGate, withReason, type EditPreview, type EditPrompt } from '../masterEdits/gate'
 import { ACTION_LABELS, editValue, fieldLabel } from '../masterEdits/labels'
 
@@ -50,7 +50,7 @@ export function useCharacters(campaignId: string) {
         await supabase
           .from('characters')
           .select(
-            'id, name, level, race_key, owner_id, portrait_url, character_classes(class_key, deity_key, patron), owner:profiles(display_name)',
+            'id, name, level, race_key, owner_id, portrait_url, character_classes(class_key, deity_key, element_key, patron), owner:profiles(display_name)',
           )
           .eq('campaign_id', campaignId)
           .order('name'),
@@ -116,8 +116,13 @@ export interface NewCharacterInput {
   raceKey: string | null
   alignmentKey: string | null
   age: number | null
+  heightCm: number | null
+  weightKg: number | null
+  eyes: string
+  skin: string
+  hair: string
   level: number
-  classes: { classKey: string; deityKey: string | null; patron: string | null }[]
+  classes: { classKey: string; deityKey: string | null; elementKey: string | null; patron: string | null }[]
   attributes: Record<AttributeKey, number>
 }
 
@@ -134,6 +139,11 @@ export function useCreateCharacter() {
           race_key: input.raceKey,
           alignment_key: input.alignmentKey,
           age: input.age,
+          height_cm: input.heightCm,
+          weight_kg: input.weightKg,
+          eyes: input.eyes.trim(),
+          skin: input.skin.trim(),
+          hair: input.hair.trim(),
           level: input.level,
         })
         .select('id')
@@ -154,6 +164,7 @@ export function useCreateCharacter() {
               character_id: character.id,
               class_key: c.classKey,
               deity_key: c.deityKey,
+              element_key: c.elementKey,
               patron: c.patron?.trim() || null,
               sort_order: i,
             })),
@@ -163,7 +174,7 @@ export function useCreateCharacter() {
 
       // Una riga risorsa per ogni risorsa di classe (Spirito, Mana, …).
       const resourceKeys = new Set(
-        input.classes.map((c) => findClass(c.classKey)?.resource).filter((r): r is NonNullable<typeof r> => !!r),
+        input.classes.map((c) => getCatalog().klass(c.classKey)?.resourceKey).filter((r): r is ResourceKey => !!r),
       )
       if (resourceKeys.size > 0) {
         unwrap(
@@ -215,7 +226,7 @@ function actionPreview(target: string, action: 'insert' | 'delete'): EditPreview
   return [{ target, field: ACTION_LABELS[action], before: null, after: null }]
 }
 
-const skillName = (s: Pick<SkillRow, 'custom_name' | 'skill_key'>) => s.custom_name || findSkill(s.skill_key)?.name || s.skill_key || ''
+const skillName = (s: Pick<SkillRow, 'custom_name' | 'skill_key'>) => s.custom_name || getCatalog().skill(s.skill_key)?.name || s.skill_key || ''
 
 /**
  * Modifica della scheda. Prima di scrivere passa dal cancello della motivazione

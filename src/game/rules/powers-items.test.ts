@@ -7,31 +7,45 @@ import {
   scaleLeadingNumber,
   consumeItemPatch,
 } from '.'
+import type { ClassDefinition } from '../catalog'
+
+type ClassStub = Pick<ClassDefinition, 'key' | 'powers' | 'resourceKey'>
+const sacerdote: ClassStub = {
+  key: 'sacerdote',
+  resourceKey: 'spirito',
+  powers: { kind: 'miracle', label: 'Miracoli', singular: 'Miracolo', attribute: 'intelligenza' },
+}
+const mentalista: ClassStub = {
+  key: 'mentalista',
+  resourceKey: 'mente',
+  powers: { kind: 'mental', label: 'Poteri mentali', singular: 'Potere mentale', attribute: 'intelligenza' },
+}
+const assassino: ClassStub = { key: 'assassino', resourceKey: null, powers: null }
 
 describe('sezioni dei poteri', () => {
   it('Sacerdote → una sezione "Miracoli" con Punti Spirito', () => {
-    const sections = powerSections(['sacerdote'])
+    const sections = powerSections([sacerdote])
     expect(sections).toHaveLength(1)
     expect(sections[0]).toMatchObject({ kind: 'miracle', label: 'Miracoli', resource: 'spirito' })
   })
 
   it('classe senza poteri → nessuna sezione', () => {
-    expect(powerSections(['guerriero'])).toEqual([])
+    expect(powerSections([assassino])).toEqual([])
   })
 
   it('multiclasse → una sezione (scheda) per classe con poteri', () => {
-    const sections = powerSections(['mentalista', 'sacerdote'])
+    const sections = powerSections([mentalista, sacerdote])
     expect(sections.map((s) => s.label)).toEqual(['Poteri mentali', 'Miracoli'])
   })
 
   it('due classi con miracoli (due divinità) → una sola scheda Miracoli', () => {
-    const sections = powerSections(['sacerdote', 'sacerdote'])
+    const sections = powerSections([sacerdote, sacerdote])
     expect(sections).toHaveLength(1)
     expect(sections[0]!.classKeys).toHaveLength(2)
   })
 
   it('tipi già presenti senza classe → sezione con etichetta di default', () => {
-    const sections = powerSections(['guerriero'], ['spell'])
+    const sections = powerSections([assassino], ['spell'])
     expect(sections).toEqual([expect.objectContaining({ kind: 'spell', label: 'Incantesimi', classKeys: [] })])
   })
 })

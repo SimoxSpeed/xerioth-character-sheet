@@ -1,0 +1,124 @@
+@import '../../../styles/tokens.less';
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: @space-4;
+  align-items: start;
+
+  @media (min-width: 900px) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  }
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: @space-4;
+}
+
+.group-title {
+  .label-caps();
+  margin: 0 0 @space-2;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: @space-2;
+
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: @space-2 @space-3;
+  padding-right: 30px;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  background: var(--grain), var(--surface);
+  border: 1px solid var(--border);
+  border-radius: @radius-sm;
+  cursor: pointer;
+  transition:
+    border-color 0.12s,
+    background 0.12s,
+    transform 0.08s;
+
+  &:hover {
+    border-color: var(--frame);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft), var(--surface);
+  box-shadow: inset 4px 0 0 var(--accent);
+
+  .title {
+    color: var(--accent-strong);
+  }
+}
+
+.title {
+  font-family: @font-display;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+// Telefono: il dettaglio si apre sotto la scelta. Schermo largo: colonna a destra.
+.inline-detail {
+  margin-top: @space-2;
+
+  @media (min-width: 900px) {
+    display: none;
+  }
+}
+
+.side-detail {
+  display: none;
+
+  @media (min-width: 900px) {
+    display: block;
+    position: sticky;
+    top: calc(@topbar-height + @space-4);
+  }
+}

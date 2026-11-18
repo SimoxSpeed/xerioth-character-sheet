@@ -1,6 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { RESOURCES, type ResourceKey } from '../../../game/data/classes'
-import { findAlignment } from '../../../game/data/alignments'
+import { useCatalog } from '../../catalog/store'
 import { currentHp, experienceStatus, maxHp } from '../../../game/rules'
 import { NumberField } from '../../../components/NumberField'
 import { TextField } from '../../../components/TextField'
@@ -72,17 +72,18 @@ export function SheetHeader({ sheet }: { sheet: CharacterSheet }) {
   const [hpFlash, setHpFlash] = useState<HpFlash | null>(null)
   const [details, setDetails] = useState(false)
 
+  const catalog = useCatalog()
   const attributes = attributeValues(sheet)
   const hpMax = maxHp({
     costituzione: attributes.costituzione,
     forzaLevel: skillLevel(sheet, 'forza') ?? 0,
-    raceKey: sheet.race_key,
+    hpCoefficient: catalog.race(sheet.race_key)?.hpCoefficient,
     hpBonus: sheet.hp_bonus,
   })
   const hp = currentHp(hpMax ?? 0, sheet.temp_hp, sheet.damage_taken)
   const total = xpTotal(sheet)
   const xp = experienceStatus(total, sheet.level)
-  const alignment = findAlignment(sheet.alignment_key)
+  const alignment = catalog.alignment(sheet.alignment_key)
 
   /** Cambia un valore e propone "Annulla" con il valore precedente. */
   function track(label: string, from: number, to: number, apply: (v: number) => void) {

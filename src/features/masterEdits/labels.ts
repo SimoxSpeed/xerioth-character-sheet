@@ -1,10 +1,7 @@
 import type { Json } from '../../lib/database.types'
-import { findAlignment } from '../../game/data/alignments'
 import { ATTRIBUTES, type AttributeKey } from '../../game/data/attributes'
-import { findClass, RESOURCES, type ResourceKey } from '../../game/data/classes'
-import { findDeity } from '../../game/data/deities'
-import { findRace } from '../../game/data/races'
-import { findSkill } from '../../game/data/skills'
+import { RESOURCES, type ResourceKey } from '../../game/data/classes'
+import { getCatalog } from '../catalog/store'
 import type { EditTarget, MasterEdit } from './api'
 
 export const EDIT_TARGET_LABELS: Record<EditTarget, string> = {
@@ -41,6 +38,7 @@ const FIELD_LABELS: Record<string, string> = {
   // Classi
   class_key: 'Classe',
   deity_key: 'Divinità',
+  element_key: 'Elemento',
   patron: 'Patrono',
   // Caratteristiche, risorse
   value: 'Valore',
@@ -88,9 +86,9 @@ export function editTargetName(edit: MasterEdit): string {
     case 'resource':
       return RESOURCES[label as ResourceKey]?.label ?? label
     case 'skill':
-      return findSkill(label)?.name ?? label
+      return getCatalog().skill(label)?.name ?? label
     case 'class':
-      return findClass(label)?.name ?? label
+      return getCatalog().klass(label)?.name ?? label
     case 'xp':
       return 'Esperienza'
     default:
@@ -117,17 +115,19 @@ export function editValue(field: string | null, value: Json | null): string {
   if (typeof value !== 'string') return JSON.stringify(value)
   switch (field) {
     case 'race_key':
-      return findRace(value)?.name ?? value
+      return getCatalog().race(value)?.name ?? value
     case 'alignment_key':
-      return findAlignment(value)?.name ?? value
+      return getCatalog().alignment(value)?.name ?? value
     case 'attribute':
       return ATTRIBUTES[value as AttributeKey]?.label ?? value
     case 'class_key':
-      return findClass(value)?.name ?? value
+      return getCatalog().klass(value)?.name ?? value
     case 'deity_key':
-      return findDeity(value)?.name ?? value
+      return getCatalog().deity(value)?.name ?? value
+    case 'element_key':
+      return getCatalog().element(value)?.name ?? value
     case 'skill_key':
-      return findSkill(value)?.name ?? value
+      return getCatalog().skill(value)?.name ?? value
     default:
       return value.length > 120 ? `${value.slice(0, 120)}…` : value
   }

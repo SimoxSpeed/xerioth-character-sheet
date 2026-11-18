@@ -2,7 +2,7 @@
 
 Fonti: scheda "Omnia Tenem - Sacerdote di Tarooth" e "Xerioth Master" (fogli *Avanzamenti*, *Critico negativo*, *Punti fato*, *Allineamenti*).
 
-**Dove stanno le regole**: tabelle e formule che non cambiano stanno **nel repository git**, come file TypeScript in `src/game/data/`, e non nel database. Le modifiche passano da una correzione al codice.
+**Dove stanno le regole**: tabelle e formule che non cambiano stanno **nel repository git**, come file TypeScript in `src/game/data/` e `src/game/rules/`. I cataloghi del manuale (razze, classi, divinità, capacità…) stanno invece nel database (02 §1). Le modifiche passano da una correzione al codice.
 
 **Principio generale**: l'app calcola solo ciò che ha una formula certa. Il resto (riuscite decise dal Master, Punti Spirito comunicati dal Master…) è un campo che il giocatore compila. Le altre formule si aggiungeranno caso per caso.
 
@@ -214,6 +214,7 @@ punti al giorno = 2 (base)
 
 - **Booster** = modificatore × moltiplicatore booster (tabella §1).
 - **Maestro**: liv. 1 → 2 punti, liv. 2 → 5, liv. 3 → 10, liv. 4 → 15. Vale **solo per l'allenamento**: si sceglie nella scheda *Allenamenti*, per ogni cosa che si allena.
+- **Fare da Maestro agli altri** (informazione del manuale, nessun calcolo sulla propria scheda): dal livello 3 di una capacità si possono insegnare i criteri base; i livelli 3, 6 e 10 valgono come Maestro di livello 1, 2 e 3 per chi si allena.
 - **Miracoli e poteri** si allenano su **Intelligenza**. Le altre capacità usano la loro caratteristica.
 
 Verifica (esempio del foglio): 2 + (4+1) + (4+1) + (4+1) + 5 + 1 = **23**. ✅
@@ -273,7 +274,11 @@ Visibile **solo se il personaggio possiede la capacità Lancio Rapido**. È un *
 
 ## 8. Requisiti delle capacità
 
-Dal catalogo *Capacità*: ogni capacità ha una caratteristica di appartenenza e dei **requisiti** (es. *Contrattacco*: Ambidestro 3; *Comandare*: Fascino 15 e Carisma 1). Il catalogo sta in git. L'app mostra ✅/❌ e cosa manca quando si aggiunge una capacità. Il "livello max" del catalogo è solo un'indicazione.
+Dal catalogo *Capacità* di **Xerioth manuale** (nomi e testi identici al manuale): ogni capacità ha una caratteristica di appartenenza e dei **requisiti** (es. *Contrattacco*: Ambidestro 3; *Comandare*: Fascino 15 e Carisma 1). Il catalogo sta nel database (tabella `skills`). L'app mostra ✅/❌ e cosa manca quando si aggiunge una capacità. Il "livello max" del catalogo è solo un'indicazione.
+
+- **Eccezioni al manuale** decise dal Master: Teologia max **10** (il manuale dice 8), Concentrazione max **4** (il manuale dice 10).
+- **Destrezza**, **Resistenza alla Fatica**, **Resilienza** non sono nel manuale: vengono da *Xerioth Master › Avanzamenti* e si acquisiscono a livello 1 da sole quando si hanno i prerequisiti (§6).
+- **Identificazione oggetti magici** (citata dalla Magia Pura) è nel catalogo senza requisiti né descrizione, con Intelligenza come caratteristica provvisoria.
 
 ## 9. Allineamenti
 

@@ -1,0 +1,64 @@
+@import '../../../styles/tokens.less';
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: @space-5;
+}
+
+.attributes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: @space-3;
+}
+
+.attribute {
+  .sheet-box();
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: @space-2;
+  padding: @space-3;
+}
+
+.modifier {
+  min-width: 2.5em;
+  text-align: right;
+  font-family: @font-display;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: @space-3;
+}
+
+.stat {
+  .sheet-box();
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: @space-2;
+  padding: @space-3;
+}
+
+.stat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: @space-2;
+  font-weight: 600;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.hp {
+  font-family: @font-display;
+  font-size: 24px;
+  color: var(--c-hp);
+}

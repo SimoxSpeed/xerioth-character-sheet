@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { ATTRIBUTES, ATTRIBUTE_KEYS, type AttributeKey } from '../../../../game/data/attributes'
-import { findSkill } from '../../../../game/data/skills'
+import { useCatalog } from '../../../catalog/store'
 import { attributeModifier, skillNextCost } from '../../../../game/rules'
 import { NumberField } from '../../../../components/NumberField'
 import {
@@ -200,7 +200,7 @@ function SkillItem({ sheet, skill, showAttribute = false }: ItemProps) {
   const [expanded, setExpanded] = useState(false)
 
   const name = skillDisplayName(skill)
-  const definition = findSkill(skill.skill_key)
+  const definition = useCatalog().skill(skill.skill_key)
   const description = skill.description || definition?.description || ''
   const nextCost = skillNextCost(skill.level, skill.is_maxed)
   const trigger = useRollTrigger({ label: name, attribute: skill.attribute, level: skill.level, isMaxed: skill.is_maxed })

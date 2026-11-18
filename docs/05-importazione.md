@@ -5,7 +5,7 @@
 ## Principi già decisi
 
 - I **dati narrativi** (preghiere, diari, appunti) sono personali: vanno **solo nel database**, mai nel repository git. Eventuali file intermedi di lavoro restano fuori da git.
-- I **dati statici** (catalogo capacità, razze, divinità, allineamenti, tabelle) vengono estratti dai fogli una volta sola e finiscono in `src/game/data/` (git). Questo serve già per la Fase 1.
+- I **dati statici** (catalogo capacità, razze, divinità, allineamenti, tabelle) vengono estratti dai fogli una volta sola e finiscono nei cataloghi del database (02 §1), scritti con una migrazione; le tabelle numeriche in `src/game/data/` (git). Questo serve già per la Fase 1.
 - Ogni personaggio importato viene assegnato al suo giocatore e alla sua campagna.
 - I testi restano **identici** all'originale, refusi compresi.
 

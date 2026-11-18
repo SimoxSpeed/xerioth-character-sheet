@@ -1,6 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { ATTRIBUTES, ATTRIBUTE_KEYS, type AttributeKey } from '../../../../game/data/attributes'
-import { SKILLS, type SkillDefinition } from '../../../../game/data/skills'
+import type { SkillDefinition } from '../../../../game/catalog'
+import { useCatalog } from '../../../catalog/store'
 import { checkRequirements } from '../../../../game/rules'
 import { Dialog } from '../../../../components/Dialog'
 import { attributeValues, skillLevels, useAddSkill, type CharacterSheet } from '../../api'
@@ -46,6 +47,7 @@ export function AddSkillDialog({ sheet, open, onClose }: Props) {
 
 function CatalogPicker({ sheet }: { sheet: CharacterSheet }) {
   const add = useAddSkill(sheet.id)
+  const catalog = useCatalog()
   const [search, setSearch] = useState('')
   const [attributeFilter, setAttributeFilter] = useState<AttributeKey | ''>('')
   const [onlyAvailable, setOnlyAvailable] = useState(false)
@@ -57,11 +59,12 @@ function CatalogPicker({ sheet }: { sheet: CharacterSheet }) {
 
   const entries = useMemo(() => {
     const query = search.trim().toLowerCase()
-    return SKILLS.filter((s) => !attributeFilter || s.attribute === attributeFilter)
+    const skillName = (key: string) => catalog.skill(key)?.name
+    return catalog.skills.filter((s) => !attributeFilter || s.attribute === attributeFilter)
       .filter((s) => !query || s.name.toLowerCase().includes(query) || s.description.toLowerCase().includes(query))
-      .map((s) => ({ skill: s, ...checkRequirements(s.requirements, { attributes, skillLevels: levels, powerNames }) }))
+      .map((s) => ({ skill: s, ...checkRequirements(s.requirements, { attributes, skillLevels: levels, powerNames, skillName }) }))
       .filter((e) => !onlyAvailable || (e.allMet && !owned.has(e.skill.key)))
-  }, [search, attributeFilter, onlyAvailable, attributes, levels, powerNames, owned])
+  }, [catalog, search, attributeFilter, onlyAvailable, attributes, levels, powerNames, owned])
 
   function addSkill(skill: SkillDefinition) {
     add.mutate({ skillKey: skill.key, customName: null, attribute: skill.attribute, level: 0 })

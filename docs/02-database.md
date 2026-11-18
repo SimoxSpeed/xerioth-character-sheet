@@ -4,54 +4,115 @@
 
 | Dove | Cosa | Perché |
 |---|---|---|
-| **Repository git** (`src/game/data/`) | Dati che **non variano**: tabelle dei costi, modificatori, razze e coefficienti PF, classi (template), divinità, allineamenti, catalogo capacità e requisiti, tabelle mana e allenamento | Versionati e revisionabili; si cambiano con una correzione al codice |
-| **Database Supabase** | Dati che **variano** e sono **personali**: utenti, campagne, personaggi, diari, domande al Master, tiri | Ognuno vede solo ciò che gli spetta (regole RLS) |
+| **Repository git** (`src/game/`) | **Tabelle numeriche e formule**: modificatori e costi delle caratteristiche, costi dei livelli, tabella del mana e del costo di lancio, allenamento. Più la **configurazione legata al codice**: le 6 caratteristiche, le risorse (Spirito, Mana, Mente, Anima), i tipi di potere | Le formule e i loro test stanno insieme; si cambiano con una correzione al codice |
+| **Database Supabase: cataloghi** | I **cataloghi del manuale**, con i loro testi: razze, classi e carriere, elementi, divinità, allineamenti, capacità, armi e armature | I testi si leggono in creazione personaggio e nel Compendio; le schede li richiamano con chiavi esterne vere |
+| **Database Supabase: dati personali** | Utenti, campagne, personaggi, diari, domande al Master, tiri | Ognuno vede solo ciò che gli spetta (regole RLS) |
 
-Nel database i dati statici si richiamano con una **chiave testuale**, ad esempio `race_key = 'umano'`, `class_key = 'sacerdote'`, `skill_key = 'teologia'`. Il controllo che la chiave esista lo fa l'app.
+**I cataloghi si scrivono una volta**, con una migrazione che riporta il manuale (fonte: *Xerioth manuale*, testi identici, dubbi in 07). Non cambiano durante il gioco: nessuna pagina li modifica. Se un giorno serve correggerli, si scrive un'altra migrazione.
 
-Convenzioni: tabelle e colonne in inglese (`snake_case`), testi visibili in italiano. Chiavi `uuid`, con `created_at` / `updated_at` su ogni tabella. Lo schema è scritto come **migrazioni SQL** in `supabase/migrations/`.
+Le schede richiamano i cataloghi con una **chiave testuale** (`race_key = 'umano'`, `class_key = 'sacerdote'`, `skill_key = 'teologia'`), che ora è una **chiave esterna**: il database rifiuta chiavi inesistenti.
+
+Convenzioni: tabelle e colonne in inglese (`snake_case`), testi visibili in italiano. Chiavi `uuid` per i dati personali, chiave testuale per i cataloghi; `created_at` / `updated_at` su ogni tabella di dati personali. Lo schema è scritto come **migrazioni SQL** in `supabase/migrations/`.
 
 ---
 
-## 1. Dati statici su git (`src/game/data/`)
+## 1. Cataloghi
+
+### 1.1 Cosa resta su git (`src/game/`)
 
 | File | Contenuto |
 |---|---|
-| `attributes.ts` | le 6 caratteristiche, tabella modificatore/booster, costi per arrivare al valore N (4–30) |
-| `progression.ts` | costi dei livelli di capacità e incantesimi (0–20), costo dei livelli del personaggio |
-| `races.ts` | razze, descrizione, coefficiente PF |
-| `classes.ts` | **template di classe** (vedi sotto) |
-| `deities.ts` | divinità (Xenea, Vex, Morgoroth, Tarooth, Ydelx, Xutux Nero, Xutux Bianco, Zeria…) |
-| `alignments.ts` | 9 allineamenti con descrizione |
-| `skills.ts` | catalogo capacità: caratteristica, livello max indicativo, descrizione, requisiti strutturati |
-| `training.ts` | capacità di supporto all'allenamento, punti per livello, maestri |
-| `mana.ts` | tabella T per i Punti Mana, tabella costo di lancio |
+| `data/attributes.ts` | le 6 caratteristiche, tabella modificatore/booster, costi per arrivare al valore N (4–30) |
+| `data/progression.ts` | costi dei livelli di capacità e incantesimi (0–20), costo dei livelli del personaggio |
+| `data/classes.ts` | solo **risorse** (`RESOURCES`: etichetta, tetto, regole del mana) e **tipi di potere** (`POWER_KINDS`) |
+| `data/training.ts` | capacità di supporto all'allenamento, punti per livello, maestri |
+| `data/mana.ts` | tabella T per i Punti Mana, tabella costo di lancio |
+| `rules/` | funzioni pure. Quelle che usavano un catalogo ricevono il dato come parametro (es. `maxHp` riceve il coefficiente della razza, `powerSections` le classi): i test usano piccoli cataloghi scritti nel test |
 
-### Template di classe
+`races.ts`, `deities.ts`, `alignments.ts`, `skills.ts` e la lista `CLASSES` spariscono da git: il loro contenuto passa nella migrazione.
 
-Una classe descrive **cosa ha** un personaggio di quella classe, in modo che la scheda si adatti da sola:
+### 1.2 Tabelle dei cataloghi
 
-```ts
-{
-  key: 'sacerdote',
-  name: 'Sacerdote',
-  requiresDeity: true,          // "Sacerdote di …": si sceglie la divinità
-  powers: { kind: 'miracle', label: 'Miracoli', attribute: 'intelligenza' },
-  resource: { key: 'spirito', label: 'Punti Spirito', cap: 600, computed: false },
-}
-{
-  key: 'elementalista_fuoco',
-  name: 'Elementalista del Fuoco',
-  powers: { kind: 'spell', label: 'Incantesimi', attribute: 'intelligenza' },
-  resource: { key: 'mana', label: 'Punti Mana', computed: true },   // formula §3 delle regole
-}
-```
+Tutte con `key text primary key`, `name text`, `sort_order int`. I testi assenti nel manuale sono `''`.
 
-- Un personaggio può avere **più classi** (es. Xander: Mentalista + Assassino). Le sezioni della scheda (Miracoli, Incantesimi, Poteri mentali) e le risorse (Spirito, Mana, Mente, Anima) compaiono in base alle classi.
-- Il foglio *Razze e Classi* elenca le scuole di magia: Alterazione, Evocazione, Elementalista Aria/Acqua/Fuoco/Terra, Mentalista, Necromante, Magia Pura, Incantatore. Le userei come classi da mago.
-- Possono servire **tabelle di conversione** per calcolare il costo dei poteri: si aggiungono al template della classe quando servono.
+**`races`**
+| Colonna | Tipo | Esempio |
+|---|---|---|
+| `family_key` | → race_families | `umani`, `elfi`, `altre`, `ibride` (i gruppi della tab Razze) |
+| `hp_coefficient` | int nullable | 7; null finché il Master non lo dà (Mezzelfo, Mezzorco, Icaro) |
+| `appearance` | text | "Pelle dal quasi nero al rosa pallido…" |
+| `size_lifespan` | text | "Taglia media. 150–180+ cm…" |
+| `typical_alignment` | text | "Neutrale Puro" (testo libero: il manuale scrive anche "Tende al male") |
+| `society` | text | "Insediamenti di ogni dimensione…" |
+| `traits` | text | "Comune più una lingua a scelta…" |
 
-⏳ **Elenco delle classi**: lo fornirai più avanti, con il mapping classe → etichetta dei poteri. Ogni template ha `powers.label` / `powers.singular` (es. Sacerdote → "Miracoli" / "Miracolo"): la scheda Poteri prende il nome da lì. Intanto ci sono i template provvisori Sacerdote (Punti Spirito), Mago generico (Mana), Mentalista (Punti Mente) e Classe senza poteri.
+L'introduzione comune agli elfi ("Tutti gli elfi sono leggeri, flessuosi…") sta in una tabella `race_families` (`key`, `name`, `intro`). Goblin e Satiro: famiglia `altre`, testi vuoti.
+
+**`classes`**: classi e carriere.
+| Colonna | Tipo | Esempio |
+|---|---|---|
+| `kind` | enum `class_kind` | `class` o `career` |
+| `motto` | text | "Niente è come sembra" |
+| `summary` | text | la frase sotto il titolo della tab |
+| `sections` | jsonb | le righe con etichetta della tab, nell'ordine del manuale: `[{ "title": "Descrizione Generale", "text": "…" }, …]` |
+| `resource_key` | text nullable | `mana`, `mente`, `anima`, `spirito` (chiave di `RESOURCES` in git) |
+| `power_kind` | enum `power_kind` nullable | `spell`, `miracle`, `mental` |
+| `power_label`, `power_singular` | text nullable | "Incantesimi", "Incantesimo" |
+| `power_attribute` | enum `attribute` nullable | `intelligenza` |
+| `requires_deity` | bool | true per il Sacerdote |
+| `requires_element` | bool | true per l'Elementalista |
+
+| Classe | Tipo | Risorsa | Poteri |
+|---|---|---|---|
+| Alteratore, Evocatore, Elementalista, Necromante, Magia Pura | classe | Mana | Incantesimi |
+| Mentalista | classe | Punti Mente | Poteri mentali |
+| Incantatore, Druido | classe | Anima | Incantesimi |
+| Sacerdote | classe | Punti Spirito | Miracoli |
+| Assassino, Ladro, Alchimista | carriera | — | — |
+
+Il Guerriero non c'è (dubbio aperto in 07).
+
+**`elements`**: le cinque vie dell'Elementalista.
+| Colonna | Tipo | Esempio |
+|---|---|---|
+| `nature` | text | "Vento, fulmini, levitazione e invisibilità…" |
+| `spell_examples` | text | "Evoca fulmine\nAumentare la gravità" |
+| `creatures` | text | "Elementale dell'Aria…" |
+| `opposite_key` | → elements nullable | `terra` (Puro: nessuno) |
+| `deity_key` | → deities nullable | `ayla` (Puro: nessuna) |
+
+**`deities`**
+| Colonna | Tipo | Esempio |
+|---|---|---|
+| `motto` | text | "Il tempo non dimentica" |
+| `domain` | text | "Dio del tempo e dello spazio" |
+| `lore` | text | "La divinità": "Fratello di Zeria e Simrael…" |
+| `divine_weapon` | text | "Clessidra di Tarooth, detta Tessitrice…" |
+| `outsiders` | text | "Chimera, Leone Nero, Manticora, Sfinge." |
+| `miracle_examples` | text | "Ferma tempo\nStasi corporale" |
+
+13 divinità: le 9 con una tab nel manuale, più **Ayla, Rya, Droy, Enion** (divinità degli elementi), che si possono scegliere come Sacerdote ma nel manuale hanno solo il nome: testi vuoti tranne il dominio, che riporta l'elemento ("Aria", …). Le "Capacità collegate" sono identiche per tutti i Sacerdoti: stanno nelle `sections` della classe Sacerdote.
+
+**`alignments`**: `code` ("LB"), `archetype` ("Il Crociato"), `description`, `example`.
+
+**`skills`**: `attribute` (enum), `max_level` int, `description`, `requirements` jsonb (stessa struttura di oggi: `{ type: 'attribute' | 'skill' | 'power' | 'note', … }`). Contenuto: quello attuale di `skills.ts`, già allineato al manuale.
+
+**`weapons`**: `category` text nullable ("Leggera", "Media", "Pesante", "Da tiro media", "Munizioni"), `skill_key` → skills nullable, `requirement` text, `note` text. Le voci "da definire" del manuale entrano con categoria vuota e la nota.
+
+**`armors`**: `armor_type` text ("Leggera", "Media", "Pesante"), `description`, `requirement`, `note`.
+
+**Permessi**: lettura per chiunque abbia fatto l'accesso; nessuna policy di scrittura (le scrive solo la migrazione).
+
+**Nell'app**: `CatalogGate` (`src/features/catalog/`) scarica tutti i cataloghi con un'unica query all'avvio (pochi KB, cache senza scadenza) e mostra l'app solo dopo. I componenti li leggono con `useCatalog()`, le funzioni di etichetta con `getCatalog()`: `catalog.race(key)`, `catalog.klass(key)`, `catalog.deity(key)`, `catalog.element(key)`, `catalog.skill(key)`… I tipi stanno in `src/game/catalog.ts`.
+
+**Controlli del database**: chiavi esterne verso i cataloghi; il trigger `check_character_class` rifiuta un Sacerdote senza divinità, un Elementalista senza elemento, e divinità o elemento su classi che non li prevedono. Migrazione: `20261118012220_catalogs.sql`.
+
+### 1.3 Modifiche alle schede
+
+- `character_classes.element_key` → elements, nullable: l'elemento dell'Elementalista. Obbligatorio se la classe ha `requires_element`, vuoto altrimenti (lo controlla il database).
+- `character_classes.deity_key`: obbligatorio se la classe ha `requires_deity`, vuoto altrimenti.
+- Chiavi esterne: `characters.race_key` → races, `characters.alignment_key` → alignments, `character_classes.class_key` → classes, `character_classes.deity_key` → deities, `character_skills.skill_key` → skills.
+- Omnia usa `umano`, `legale_neutrale`, `sacerdote`, `tarooth` e le chiavi attuali delle capacità: restano uguali.
 
 ---
 
@@ -165,9 +226,9 @@ Al massimo **una richiesta `pending`** per utente e campagna (indice unico parzi
 | `campaign_id` | → campaigns | Xerioth |
 | `owner_id` | → profiles | giocatore |
 | `name` | text | Omnia Tenem |
-| `race_key` | text (git) | `umano` |
+| `race_key` | text → races | `umano` |
 | `age` | int | 26 |
-| `alignment_key` | text (git) | `legale_neutrale` |
+| `alignment_key` | text → alignments | `legale_neutrale` |
 | `height_cm`, `weight_kg` | int | 175, 75 |
 | `eyes`, `skin`, `hair` | text | Ambra, Abbronzata, Bianchi |
 | `level` | int | 23 |
@@ -187,8 +248,9 @@ Al massimo **una richiesta `pending`** per utente e campagna (indice unico parzi
 | Colonna | Tipo | Esempio |
 |---|---|---|
 | `character_id` | → characters | |
-| `class_key` | text (git) | `sacerdote` |
-| `deity_key` | text nullable (git) | `tarooth` |
+| `class_key` | text → classes | `sacerdote` |
+| `deity_key` | text nullable → deities | `tarooth` (solo se la classe lo richiede) |
+| `element_key` | text nullable → elements | `fuoco` (solo Elementalista) |
 | `patron` | text nullable | "Vortex" (figlio del Dio) |
 | `sort_order` | int | |
 
@@ -213,7 +275,7 @@ Al massimo **una richiesta `pending`** per utente e campagna (indice unico parzi
 |---|---|---|
 | `id` | uuid PK | |
 | `character_id` | → characters | |
-| `skill_key` | text nullable | dal catalogo git |
+| `skill_key` | text nullable → skills | dal catalogo |
 | `custom_name` | text nullable | per varianti o capacità fuori catalogo: "Cavalcare (Viverna)" |
 | `attribute` | enum | caratteristica usata nei tiri |
 | `level` | int nullable | `null` = non appresa (NA) |

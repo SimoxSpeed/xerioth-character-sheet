@@ -1,6 +1,6 @@
 # Xerioth — schede personaggio
 
-App web per le schede del GdR Xerioth, al posto delle schede su Google Sheets. Le decisioni di progetto sono in `docs/` (00–06) e sono la fonte di verità: aggiornale quando cambia una regola, lo schema o l'interfaccia.
+App web per le schede del GdR Xerioth, al posto delle schede su Google Sheets. Le decisioni di progetto sono in `docs/` (00–07) e sono la fonte di verità: aggiornale quando cambia una regola, lo schema o l'interfaccia.
 
 ## Comandi
 
@@ -20,7 +20,8 @@ Prima di dichiarare finito un lavoro su `.ts`/`.tsx`: `npm run typecheck`; se ha
 
 ## Struttura
 
-- `src/game/data/`: dati statici del gioco (razze, classi, divinità, tabelle). Stanno su git, non nel DB.
+- `src/game/data/`: tabelle numeriche e configurazione legata al codice (caratteristiche, risorse, tipi di potere). I cataloghi del manuale (razze, classi, divinità, elementi, allineamenti, capacità, armi e armature) stanno nel DB, in sola lettura: si scrivono solo con le migrazioni.
+- `src/features/catalog/`: `CatalogGate` carica i cataloghi prima di mostrare l'app; nei componenti `useCatalog()`, nelle funzioni di etichetta `getCatalog()`. In `src/game/rules` i dati del catalogo arrivano come parametri.
 - `src/game/rules/`: funzioni pure esportate da `index.ts`, con test sui valori reali di Omnia (PF 198, Corrosione 43, allenamento 23).
 - `src/features/<area>/api.ts`: query e mutation TanStack di quell'area. Solo gli `api.ts` (e l'auth) importano `lib/supabase`.
 - `src/features/characters/sheet/`: la scheda, una cartella per tab.

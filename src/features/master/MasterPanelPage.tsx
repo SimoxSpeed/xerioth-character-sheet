@@ -7,6 +7,7 @@ import { useUser } from '../auth/AuthProvider'
 import { useIsMaster, useMemberships } from '../campaigns/api'
 import { CampaignAdmin } from '../campaigns/CampaignAdmin'
 import { classesLabel } from '../characters/labels'
+import { useCatalog } from '../catalog/store'
 import { SLOT_LABELS } from '../characters/sheet/sheetHelpers'
 import { OUTCOME_LABELS, useCampaignRolls, useDiceRealtime } from '../dice/api'
 import { THREAD_TARGET_LABELS, useCampaignThreads, useCampaignThreadsRealtime, type CampaignThread } from '../threads/api'
@@ -172,9 +173,15 @@ function Party({ campaignId }: { campaignId: string }) {
 }
 
 function PartyCard({ member }: { member: PartyMember }) {
+  const catalog = useCatalog()
   const costituzione = member.character_attributes.find((a) => a.attribute === 'costituzione')?.value ?? 10
   const forzaLevel = member.character_skills.find((s) => s.skill_key === 'forza')?.level ?? 0
-  const hpMax = maxHp({ costituzione, forzaLevel, raceKey: member.race_key, hpBonus: member.hp_bonus })
+  const hpMax = maxHp({
+    costituzione,
+    forzaLevel,
+    hpCoefficient: catalog.race(member.race_key)?.hpCoefficient,
+    hpBonus: member.hp_bonus,
+  })
   const hp = hpMax === null ? null : currentHp(hpMax, member.temp_hp, member.damage_taken)
 
   return (
